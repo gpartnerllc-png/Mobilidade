@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA MOBILIDADE - GATEWAY INTELIGENTE</title>
+    <title>IA MOBILIDADE - GATEWAY DIRETO</title>
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', -apple-system, sans-serif; text-align: center; padding: 20px; }
         .header { margin-bottom: 30px; border-bottom: 2px solid #1ed760; padding-bottom: 15px; }
-        .header h1 { font-size: 1.8rem; margin: 0; letter-spacing: 2px; }
+        .header h1 { font-size: 1.8rem; margin: 0; letter-spacing: 2px; color: #1ed760; }
         .header p { color: #888; font-size: 0.9rem; margin-top: 5px; }
         
         .input-box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px; }
         label { display: block; color: #1ed760; font-weight: bold; margin-bottom: 10px; font-size: 0.8rem; text-transform: uppercase; }
-        input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: #00ff5f; font-size: 1.6rem; text-align: center; box-sizing: border-box; }
+        input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: #00ff5f; font-size: 1.6rem; text-align: center; box-sizing: border-box; outline: none; }
         
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
         
         /* Cores de Autoridade */
-        .infinite { background: #00ff5f; color: #000; grid-column: span 2; font-size: 1rem; margin-bottom: 10px; box-shadow: 0 0 15px rgba(0,255,95,0.3); }
+        .infinite { background: #00ff5f; color: #000; grid-column: span 2; font-size: 1rem; margin-bottom: 10px; box-shadow: 0 0 15px rgba(0,255,95,0.4); }
         .inter { background: #ff7a00; }
         .nubank { background: #820ad1; }
         .itau { background: #ec7000; }
@@ -27,26 +27,25 @@
         .santander { background: #ec0000; }
         
         .btn:active { transform: scale(0.95); opacity: 0.8; }
-        
         footer { margin-top: 30px; color: #444; font-size: 0.7rem; letter-spacing: 1px; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>IA MOBILIDADE</h1>
-        <p>SISTEMA DE RECARGA AUTOMATIZADA</p>
+        <p>RECARGA AUTOMÁTICA INTELIGENTE</p>
     </div>
     
     <div class="input-box">
-        <label>Identificador do Cartão</label>
+        <label>ID do Cartão Identificado</label>
         <input type="number" id="cardID" placeholder="Nº do Cartão" value="1023449012">
     </div>
     
-    <p style="color:#666; font-size:0.8rem; margin-bottom:15px;">ESCOLHA O SEU BANCO PARA PAGAR</p>
+    <p style="color:#666; font-size:0.8rem; margin-bottom:15px;">TOQUE NO APP PARA PAGAR VIA PIX</p>
     
     <div class="grid">
-        <button class="btn infinite" onclick="pay('infinitepay')">PAGAR VIA INFINITEPAY (PIX)</button>
-        <button class="btn inter" onclick="pay('inter')">BANCO INTER</button>
+        <button class="btn infinite" onclick="pay('infinitepay')">PAGAR VIA INFINITEPAY</button>
+        <button class="btn inter" onclick="pay('inter')">INTER (PIX)</button>
         <button class="btn nubank" onclick="pay('nubank')">NUBANK</button>
         <button class="btn itau" onclick="pay('itau')">ITAÚ</button>
         <button class="btn bradesco" onclick="pay('bradesco')">BRADESCO</button>
@@ -60,38 +59,42 @@
         function pay(banco) {
             const id = document.getElementById('cardID').value;
             
-            // 1. Copia o ID para a área de transferência
+            // 1. Copia o ID para a memória do sistema
             navigator.clipboard.writeText(id).then(() => {
                 
-                // 2. Mapeamento Agressivo: Android Intents e iOS Schemes
+                // 2. Protocolos de Abertura Direta (Sem passar por Google Play)
                 const links = {
-                    'infinitepay': 'https://link.infinitepay.io/recarga', // Sua API de Checkout
-                    'inter': 'intent://#Intent;scheme=inter;package=com.bancointer;end',
-                    'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
-                    'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
-                    'bradesco': 'intent://#Intent;scheme=bradesco;package=br.com.bradesco.next;end',
-                    'caixa': 'intent://#Intent;scheme=caixa;package=br.gov.caixa.mobi;end',
-                    'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
+                    'infinitepay': 'https://link.infinitepay.io/recarga', 
+                    'inter': 'inter://pix', 
+                    'nubank': 'nubank://',
+                    'itau': 'itau://',
+                    'bradesco': 'bradesco://',
+                    'caixa': 'caixa://',
+                    'santander': 'santander://'
                 };
 
-                // 3. Feedback de IA
-                alert("IA: ID " + id + " copiado! Abrindo " + banco.toUpperCase() + ". Cole o número na área de PIX do seu banco.");
+                // Feedback da IA
+                alert("IA MOBILIDADE: ID " + id + " copiado!\n\nAbrindo o app " + banco.toUpperCase() + " agora...");
 
-                // 4. Executa a abertura forçada
-                window.location.assign(links[banco]);
+                // 3. Comando de Disparo Forçado
+                window.location.replace(links[banco]);
 
-                // 5. Fallback Inteligente: Se o app não abrir em 3s, tenta o site oficial
+                // 4. Fallback de Segurança (Caso o app não esteja instalado)
                 setTimeout(() => {
                     if (document.hasFocus()) {
-                        const webFallback = {
-                            'inter': 'https://www.bancointer.com.br/',
+                        const fallbacks = {
                             'nubank': 'https://nubank.com.br/',
+                            'inter': 'https://www.bancointer.com.br/',
                             'itau': 'https://www.itau.com.br/',
-                            'caixa': 'https://www.caixa.gov.br/'
+                            'bradesco': 'https://bradesco.com.br/'
                         };
-                        if(webFallback[banco]) window.location.href = webFallback[banco];
+                        if (fallbacks[banco]) {
+                            window.location.href = fallbacks[banco];
+                        }
                     }
-                }, 3000);
+                }, 2000);
+            }).catch(err => {
+                console.error('Erro ao copiar:', err);
             });
         }
     </script>
