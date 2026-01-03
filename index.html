@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IA MOBILIDADE - GATEWAY DIRETO</title>
     <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', -apple-system, sans-serif; text-align: center; padding: 20px; }
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; text-align: center; padding: 20px; }
         .header { margin-bottom: 30px; border-bottom: 2px solid #1ed760; padding-bottom: 15px; }
-        .header h1 { font-size: 1.8rem; margin: 0; letter-spacing: 2px; color: #1ed760; }
+        .header h1 { font-size: 1.8rem; margin: 0; color: #1ed760; letter-spacing: 2px; }
         .input-box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px; }
         label { display: block; color: #1ed760; font-weight: bold; margin-bottom: 10px; font-size: 0.8rem; text-transform: uppercase; }
         input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: #00ff5f; font-size: 1.6rem; text-align: center; box-sizing: border-box; outline: none; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
-        .infinite { background: #00ff5f; color: #000; grid-column: span 2; font-size: 1rem; margin-bottom: 10px; box-shadow: 0 0 15px rgba(0,255,95,0.4); }
+        .infinite { background: #00ff5f; color: #000; grid-column: span 2; font-size: 1rem; margin-bottom: 10px; }
         .inter { background: #ff7a00; } .nubank { background: #820ad1; } .itau { background: #ec7000; }
         .bradesco { background: #cc092f; } .caixa { background: #005ca9; } .santander { background: #ec0000; }
         .btn:active { transform: scale(0.95); opacity: 0.8; }
@@ -28,19 +28,17 @@
     
     <div class="input-box">
         <label>ID do Cartão Identificado</label>
-        <input type="number" id="cardID" placeholder="Nº do Cartão" value="1023449012">
+        <input type="number" id="cardID" value="1023449012">
     </div>
-    
-    <p style="color:#666; font-size:0.8rem; margin-bottom:15px;">TOQUE NO APP PARA PAGAR VIA PIX</p>
     
     <div class="grid">
         <button class="btn infinite" onclick="pay('infinitepay')">PAGAR VIA INFINITEPAY</button>
-        <button class="btn inter" onclick="pay('inter')">INTER (PIX)</button>
-        <button class="btn nubank" onclick="pay('nubank')">NUBANK (PIX)</button>
-        <button class="btn itau" onclick="pay('itau')">ITAÚ (PIX)</button>
-        <button class="btn bradesco" onclick="pay('bradesco')">BRADESCO (PIX)</button>
-        <button class="btn caixa" onclick="pay('caixa')">CAIXA (PIX)</button>
-        <button class="btn santander" onclick="pay('santander')">SANTANDER (PIX)</button>
+        <button class="btn inter" onclick="pay('inter')">INTER</button>
+        <button class="btn nubank" onclick="pay('nubank')">NUBANK</button>
+        <button class="btn itau" onclick="pay('itau')">ITAÚ</button>
+        <button class="btn bradesco" onclick="pay('bradesco')">BRADESCO</button>
+        <button class="btn caixa" onclick="pay('caixa')">CAIXA</button>
+        <button class="btn santander" onclick="pay('santander')">SANTANDER</button>
     </div>
 
     <footer>SÉRIE TERMINAL: PB1F252F75254</footer>
@@ -49,33 +47,24 @@
         function pay(banco) {
             const id = document.getElementById('cardID').value;
             
-            // INSIRA SUA CHAVE PIX OU LINK DE PAGAMENTO ABAIXO
-            const minhaChavePix = "SUA_CHAVE_AQUI"; 
-
-            navigator.clipboard.writeText(minhaChavePix).then(() => {
+            // 1. Copia o ID para a memória
+            navigator.clipboard.writeText(id).then(() => {
                 
-                // Mapeamento para abrir APLICATIVOS DIRETOS (Deep Links)
+                // 2. Mapeamento de INTENTS (Isso força o Android a abrir o APP instalado)
                 const links = {
                     'infinitepay': 'https://link.infinitepay.io/recarga', 
-                    'inter': 'inter://', 
-                    'nubank': 'nubank://',
-                    'itau': 'itau://',
-                    'bradesco': 'bradesco://',
-                    'caixa': 'caixa://',
-                    'santander': 'santander://'
+                    'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
+                    'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
+                    'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
+                    'bradesco': 'intent://#Intent;scheme=bradesco;package=br.com.bradesco.next;end',
+                    'caixa': 'intent://#Intent;scheme=caixa;package=br.gov.caixa.mobi;end',
+                    'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
                 };
 
-                alert("IA: CHAVE PIX COPIADA!\n\nAbrindo o app " + banco.toUpperCase() + " agora. Basta colar e pagar.");
+                alert("IA: ID " + id + " copiado! Abrindo o banco escolhido...");
 
-                // Disparo para abrir o App
+                // 3. Comando de disparo forçado
                 window.location.href = links[banco];
-
-                // Backup caso o app não exista no aparelho
-                setTimeout(() => {
-                    if (document.hasFocus()) {
-                        alert("O aplicativo " + banco + " não parece estar instalado. Tente outro banco.");
-                    }
-                }, 2500);
             });
         }
     </script>
