@@ -3,79 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA MOBILIDADE - GATEWAY GRATUITO</title>
+    <title>IA MOBILIDADE - CENTRAL DE COMANDO</title>
     <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; text-align: center; padding: 20px; }
-        .header { margin-bottom: 25px; border-bottom: 2px solid #1ed760; padding-bottom: 10px; }
-        .header h1 { font-size: 1.6rem; color: #1ed760; margin: 0; }
-        .input-box { background: #111; padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: #00ff5f; font-size: 1.5rem; text-align: center; box-sizing: border-box; outline: none; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { padding: 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.8rem; text-transform: uppercase; transition: 0.1s; }
-        .infinite { background: #1ed760; color: #000; grid-column: span 2; font-size: 0.9rem; }
+        body { background: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 450px; }
+        .header { text-align: center; border-bottom: 2px solid #1ed760; margin-bottom: 20px; padding-bottom: 10px; }
+        .header h1 { font-size: 1.5rem; color: #1ed760; margin: 0; }
+        
+        /* Estilo dos Cartões de Recarga */
+        .card { background: #1e293b; border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 8px solid; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .brb { border-left-color: #3b82f6; }
+        .utb { border-left-color: #f97316; }
+        h2 { margin: 0; font-size: 1rem; color: #94a3b8; text-transform: uppercase; }
+        .id-number { font-size: 1.6rem; font-weight: bold; margin: 10px 0; color: #fff; font-family: monospace; }
+        
+        /* Grade de Bancos */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.75rem; text-transform: uppercase; transition: 0.1s; text-align: center; text-decoration: none; }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        
+        /* Cores dos Botões */
+        .copy-btn { background: #334155; display: block; width: 100%; margin-top: 5px; }
+        .infinite { background: #1ed760; color: #000; grid-column: span 2; }
         .inter { background: #ff7a00; } .nubank { background: #820ad1; } .itau { background: #ec7000; }
         .bradesco { background: #cc092f; } .caixa { background: #005ca9; } .santander { background: #ec0000; }
-        .btn:active { transform: scale(0.95); opacity: 0.8; }
-        footer { margin-top: 25px; color: #444; font-size: 0.6rem; letter-spacing: 1px; }
+        
+        footer { margin-top: 25px; color: #475569; font-size: 0.7rem; text-align: center; }
     </style>
 </head>
 <body>
+
+<div class="container">
     <div class="header">
         <h1>IA MOBILIDADE</h1>
-        <p style="color:#888; font-size:0.8rem;">SISTEMA ATIVO - CUSTO ZERO</p>
+        <small>PROTOCOLO ATIVO - TERMINAL PB1F252F75254</small>
     </div>
-    
-    <div class="input-box">
-        <label style="color:#1ed760; font-size:0.7rem; font-weight:bold; display:block; margin-bottom:5px;">CARTÃO IDENTIFICADO</label>
-        <input type="number" id="cardID" value="1023449012">
+
+    <div class="card brb">
+        <h2>BRB MOBILIDADE</h2>
+        <div class="id-number" id="id-brb">1023449012</div>
+        <button class="btn copy-btn" onclick="copyAndOpen('1023449012', 'https://mobilidade.brb.com.br')">COPIAR E ABRIR RECARGA</button>
     </div>
-    
+
+    <div class="card utb">
+        <h2>UTB ENTORNO</h2>
+        <div class="id-number" id="id-utb">03620000035530-4</div>
+        <button class="btn copy-btn" onclick="copyAndOpen('03620000035530-4', 'http://www.utb.com.br')">COPIAR E ABRIR RECARGA</button>
+    </div>
+
+    <h2 style="text-align: center; font-size: 0.8rem; margin: 20px 0 10px;">SELECIONE O BANCO PARA PAGAMENTO</h2>
+
     <div class="grid">
-        <button class="btn infinite" onclick="pay('infinitepay')">PAGAR VIA INFINITEPAY</button>
-        <button class="btn inter" onclick="pay('inter')">INTER</button>
-        <button class="btn nubank" onclick="pay('nubank')">NUBANK</button>
-        <button class="btn itau" onclick="pay('itau')">ITAÚ</button>
-        <button class="btn bradesco" onclick="pay('bradesco')">BRADESCO</button>
-        <button class="btn caixa" onclick="pay('caixa')">CAIXA</button>
-        <button class="btn santander" onclick="pay('santander')">SANTANDER</button>
+        <button class="btn infinite" onclick="openBank('infinitepay')">PAGAR VIA INFINITEPAY</button>
+        <button class="btn inter" onclick="openBank('inter')">INTER</button>
+        <button class="btn nubank" onclick="openBank('nubank')">NUBANK</button>
+        <button class="btn itau" onclick="openBank('itau')">ITAÚ</button>
+        <button class="btn bradesco" onclick="openBank('bradesco')">BRADESCO</button>
+        <button class="btn caixa" onclick="openBank('caixa')">CAIXA</button>
+        <button class="btn santander" onclick="openBank('santander')">SANTANDER</button>
     </div>
 
-    <footer>SÉRIE TERMINAL: PB1F252F75254</footer>
+    <footer>SISTEMA UNIFICADO V2.0 - INTEGRADO</footer>
+</div>
 
-    <script>
-        function pay(banco) {
-            const id = document.getElementById('cardID').value;
-            
-            // LINK DE DIRECIONAMENTO PARA CARREGAR O CARTÃO
-            const siteCarregar = 'https://link.infinitepay.io/recarga'; 
+<script>
+    // Função para Copiar ID e abrir o site de recarga desejado
+    function copyAndOpen(id, url) {
+        navigator.clipboard.writeText(id).then(() => {
+            alert("ID " + id + " COPIADO!\n\nAbrindo site de recarga...");
+            window.open(url, '_blank');
+        });
+    }
 
-            // 1. Copia o ID para a memória do aparelho
-            navigator.clipboard.writeText(id).then(() => {
-                
-                alert("ID " + id + " COPIADO!\n\nRedirecionando para Carga e Banco...");
+    // Função para abrir os Bancos diretamente (Intents)
+    function openBank(banco) {
+        // Pega o ID que estiver no primeiro card como padrão para o banco
+        const idPadrao = "1023449012";
+        
+        navigator.clipboard.writeText(idPadrao).then(() => {
+            const links = {
+                'infinitepay': 'https://link.infinitepay.io/recarga',
+                'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
+                'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
+                'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
+                'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
+                'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
+                'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
+            };
 
-                // 2. ABRE O SITE DE CARREGAMENTO EM NOVA ABA (DIRECIONAMENTO)
-                window.open(siteCarregar, '_blank');
+            alert("ID COPIADO!\n\nAbrindo aplicativo do banco...");
+            window.location.href = links[banco];
+        });
+    }
+</script>
 
-                // 3. Mapeamento de Intents para abrir os APPS
-                const links = {
-                    'infinitepay': siteCarregar, 
-                    'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
-                    'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
-                    'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
-                    'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
-                    'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
-                    'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
-                };
-
-                // 4. Disparo para o banco após o direcionamento
-                setTimeout(() => {
-                    if (banco !== 'infinitepay') {
-                        window.location.href = links[banco];
-                    }
-                }, 1500); // Tempo para garantir a abertura da aba de carga
-            });
-        }
-    </script>
 </body>
 </html>
