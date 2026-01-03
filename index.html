@@ -45,14 +45,21 @@
     <script>
         function pay(banco) {
             const id = document.getElementById('cardID').value;
-            const recargaLink = 'https://link.infinitepay.io/recarga';
             
+            // LINK DE DIRECIONAMENTO PARA CARREGAR O CARTÃO
+            const siteCarregar = 'https://link.infinitepay.io/recarga'; 
+
             // 1. Copia o ID para a memória do aparelho
             navigator.clipboard.writeText(id).then(() => {
                 
-                // 2. Intents para abrir os APPS instalados diretamente
+                alert("ID " + id + " COPIADO!\n\nRedirecionando para Carga e Banco...");
+
+                // 2. ABRE O SITE DE CARREGAMENTO EM NOVA ABA (DIRECIONAMENTO)
+                window.open(siteCarregar, '_blank');
+
+                // 3. Mapeamento de Intents para abrir os APPS
                 const links = {
-                    'infinitepay': recargaLink, 
+                    'infinitepay': siteCarregar, 
                     'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
                     'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
                     'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
@@ -61,17 +68,12 @@
                     'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
                 };
 
-                alert("ID " + id + " COPIADO!\n\nAbrindo o sistema de carga e o banco...");
-
-                // 3. Abre a aba de recarga/pagamento (Como era no início)
-                window.open(recargaLink, '_blank');
-
-                // 4. Disparo para o banco selecionado
+                // 4. Disparo para o banco após o direcionamento
                 setTimeout(() => {
                     if (banco !== 'infinitepay') {
                         window.location.href = links[banco];
                     }
-                }, 1000);
+                }, 1500); // Tempo para garantir a abertura da aba de carga
             });
         }
     </script>
