@@ -23,7 +23,7 @@
 <body>
     <div class="header">
         <h1>IA MOBILIDADE</h1>
-        <p>RECARGA AUTOMÁTICA INTELIGENTE</p>
+        <p>ABERTURA DIRETA DE APP</p>
     </div>
     
     <div class="input-box">
@@ -41,16 +41,16 @@
         <button class="btn santander" onclick="pay('santander')">SANTANDER</button>
     </div>
 
-    <footer>SÉRIE TERMINAL: PB1F252F75254</footer>
+    <footer>TERMINAL: PB1F252F75254</footer>
 
     <script>
         function pay(banco) {
             const id = document.getElementById('cardID').value;
             
-            // 1. Copia o ID para a memória
+            // 1. Copia o ID para o cliente colar no banco
             navigator.clipboard.writeText(id).then(() => {
                 
-                // 2. Mapeamento de INTENTS (Isso força o Android a abrir o APP instalado)
+                // 2. Mapeamento de INTENTS (Endereços internos do Android)
                 const links = {
                     'infinitepay': 'https://link.infinitepay.io/recarga', 
                     'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
@@ -61,10 +61,10 @@
                     'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
                 };
 
-                alert("IA: ID " + id + " copiado! Abrindo o banco escolhido...");
+                alert("IA: ID " + id + " copiado! Abrindo o banco...");
 
-                // 3. Comando de disparo forçado
-                window.location.href = links[banco];
+                // 3. Execução do comando de abertura
+                window.location.assign(links[banco]);
             });
         }
     </script>
