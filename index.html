@@ -3,17 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA MOBILIDADE - DISPARO DIRETO</title>
+    <title>IA MOBILIDADE - CHECKOUT PIX DIRETO</title>
     <style>
         body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; text-align: center; padding: 20px; }
         .header { margin-bottom: 30px; border-bottom: 2px solid #1ed760; padding-bottom: 15px; }
         .header h1 { font-size: 1.8rem; margin: 0; color: #1ed760; letter-spacing: 2px; }
+        
         .input-box { background: #111; padding: 20px; border-radius: 15px; border: 1px solid #222; margin-bottom: 25px; }
+        label { display: block; color: #1ed760; font-weight: bold; margin-bottom: 10px; font-size: 0.8rem; text-transform: uppercase; }
         input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #333; background: #000; color: #00ff5f; font-size: 1.6rem; text-align: center; box-sizing: border-box; outline: none; }
+        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; transition: 0.2s; text-transform: uppercase; }
-        .inter { background: #ff7a00; } .nubank { background: #820ad1; } .itau { background: #ec7000; }
-        .bradesco { background: #cc092f; } .caixa { background: #005ca9; } .santander { background: #ec0000; }
+        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; text-transform: uppercase; }
+        
+        /* Cores de Autoridade dos Bancos */
+        .infinite { background: #00ff5f; color: #000; grid-column: span 2; font-size: 1rem; box-shadow: 0 0 15px rgba(0,255,95,0.4); }
+        .inter { background: #ff7a00; }
+        .nubank { background: #820ad1; }
+        .itau { background: #ec7000; }
+        .bradesco { background: #cc092f; }
+        .caixa { background: #005ca9; }
+        .santander { background: #ec0000; }
+        
         .btn:active { transform: scale(0.95); opacity: 0.8; }
         footer { margin-top: 30px; color: #444; font-size: 0.7rem; }
     </style>
@@ -21,47 +32,56 @@
 <body>
     <div class="header">
         <h1>IA MOBILIDADE</h1>
-        <p>ABERTURA IMEDIATA DE BANCO</p>
+        <p>COBRANÇA PIX IMEDIATA</p>
     </div>
     
     <div class="input-box">
-        <input type="number" id="cardID" value="1023449012">
+        <label>ID DO CARTÃO PARA RECARGA</label>
+        <input type="number" id="cardID" placeholder="Nº do Cartão" value="1023449012">
     </div>
-
+    
+    <p style="color:#666; font-size:0.8rem; margin-bottom:15px;">SELECIONE SEU BANCO PARA PAGAR</p>
+    
     <div class="grid">
-        <button class="btn inter" onclick="openApp('inter')">INTER</button>
-        <button class="btn nubank" onclick="openApp('nubank')">NUBANK</button>
-        <button class="btn itau" onclick="openApp('itau')">ITAÚ</button>
-        <button class="btn bradesco" onclick="openApp('bradesco')">BRADESCO</button>
-        <button class="btn caixa" onclick="openApp('caixa')">CAIXA</button>
-        <button class="btn santander" onclick="openApp('santander')">SANTANDER</button>
+        <button class="btn infinite" onclick="pay('infinitepay')">GERAR PIX AGORA</button>
+        <button class="btn inter" onclick="pay('inter')">INTER</button>
+        <button class="btn nubank" onclick="pay('nubank')">NUBANK</button>
+        <button class="btn itau" onclick="pay('itau')">ITAÚ</button>
+        <button class="btn bradesco" onclick="pay('bradesco')">BRADESCO</button>
+        <button class="btn caixa" onclick="pay('caixa')">CAIXA</button>
+        <button class="btn santander" onclick="pay('santander')">SANTANDER</button>
     </div>
 
-    <footer>TERMINAL: PB1F252F75254</footer>
+    <footer>SÉRIE TERMINAL: PB1F252F75254</footer>
 
     <script>
-        function openApp(banco) {
+        function pay(banco) {
             const id = document.getElementById('cardID').value;
-            
-            // 1. Copia o ID do cartão para o usuário colar no banco
-            navigator.clipboard.writeText(id);
+            const pixLink = "https://link.infinitepay.io/recarga-mobilidade"; // SUBSTITUA PELO SEU LINK PIX
 
-            // 2. Esquemas de abertura direta (Custom URIs)
-            const protocols = {
-                'inter': 'inter://',
-                'nubank': 'nubank://',
-                'itau': 'itau://',
-                'bradesco': 'bradesco://',
-                'caixa': 'caixa://',
-                'santander': 'santander://'
-            };
+            navigator.clipboard.writeText(id).then(() => {
+                
+                // Mapeamento de URIs para abrir APPS direto (Sem Google Play)
+                const apps = {
+                    'infinitepay': pixLink,
+                    'inter': 'inter://pix',
+                    'nubank': 'nubank://',
+                    'itau': 'itau://',
+                    'bradesco': 'bradesco://',
+                    'caixa': 'caixa://',
+                    'santander': 'santander://'
+                };
 
-            // 3. Disparo de IA - Tenta abrir o App instalado
-            window.location.href = protocols[banco];
+                alert("IA: Cartão " + id + " copiado!\n\nSeu banco abrirá agora. Use o 'PIX Copia e Cola' com o link de cobrança.");
 
-            // 4. Se o app não abrir, o navegador vai ficar na mesma página. 
-            // Não colocaremos redirecionamento para lojas para evitar o seu erro.
-            console.log("IA disparada para o banco: " + banco);
+                // Primeiro abre o seu link de cobrança em uma nova aba para gerar o QR Code/Copia e Cola
+                window.open(pixLink, '_blank');
+
+                // Depois de 1 segundo, tenta abrir o APP do banco escolhido no smartphone
+                setTimeout(() => {
+                    window.location.href = apps[banco];
+                }, 1000);
+            });
         }
     </script>
 </body>
