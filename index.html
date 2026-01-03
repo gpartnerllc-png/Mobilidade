@@ -45,25 +45,33 @@
     <script>
         function pay(banco) {
             const id = document.getElementById('cardID').value;
+            const recargaLink = 'https://link.infinitepay.io/recarga';
             
             // 1. Copia o ID para a memória do aparelho
             navigator.clipboard.writeText(id).then(() => {
                 
                 // 2. Intents para abrir os APPS instalados diretamente
                 const links = {
-                    'infinitepay': 'https://link.infinitepay.io/recarga', 
+                    'infinitepay': recargaLink, 
                     'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
                     'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
                     'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
-                  'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
+                    'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
                     'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
                     'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
                 };
 
-                alert("ID " + id + " COPIADO!\n\nAbrindo o banco agora...");
+                alert("ID " + id + " COPIADO!\n\nAbrindo o sistema de carga e o banco...");
 
-                // 3. Disparo direto para o sistema
-                window.location.href = links[banco];
+                // 3. Abre a aba de recarga/pagamento (Como era no início)
+                window.open(recargaLink, '_blank');
+
+                // 4. Disparo para o banco selecionado
+                setTimeout(() => {
+                    if (banco !== 'infinitepay') {
+                        window.location.href = links[banco];
+                    }
+                }, 1000);
             });
         }
     </script>
