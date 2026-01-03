@@ -46,11 +46,11 @@
     <div class="grid">
         <button class="btn infinite" onclick="pay('infinitepay')">PAGAR VIA INFINITEPAY</button>
         <button class="btn inter" onclick="pay('inter')">INTER (PIX)</button>
-        <button class="btn nubank" onclick="pay('nubank')">NUBANK</button>
-        <button class="btn itau" onclick="pay('itau')">ITAÚ</button>
-        <button class="btn bradesco" onclick="pay('bradesco')">BRADESCO</button>
-        <button class="btn caixa" onclick="pay('caixa')">CAIXA</button>
-        <button class="btn santander" onclick="pay('santander')">SANTANDER</button>
+        <button class="btn nubank" onclick="pay('nubank')">NUBANK (PIX)</button>
+        <button class="btn itau" onclick="pay('itau')">ITAÚ (PIX)</button>
+        <button class="btn bradesco" onclick="pay('bradesco')">BRADESCO (PIX)</button>
+        <button class="btn caixa" onclick="pay('caixa')">CAIXA (PIX)</button>
+        <button class="btn santander" onclick="pay('santander')">SANTANDER (PIX)</button>
     </div>
 
     <footer>SÉRIE TERMINAL: PB1F252F75254</footer>
@@ -65,7 +65,7 @@
                 // 2. Protocolos de Abertura Direta (Sem passar por Google Play)
                 const links = {
                     'infinitepay': 'https://link.infinitepay.io/recarga', 
-                    'inter': 'inter://pix', 
+                    'inter': 'https://play.google.com/store/apps/details?id=br.com.intermedium&pli=1/', 
                     'nubank': 'nubank://pix',
                     'itau': 'itau://pix',
                     'bradesco': 'bradesco://pix',
