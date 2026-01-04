@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA MOBILIDADE - OPERAÇÃO ELITE</title>
+    <title>IA MOBILIDADE - CENTRAL DE COMANDO</title>
     <style>
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 400px; }
-        .header { text-align: center; border-bottom: 2px solid #1ed760; margin-bottom: 15px; padding-bottom: 5px; }
-        .header h1 { font-size: 1.4rem; color: #1ed760; margin: 0; }
-        .card { background: #111; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #222; border-left: 6px solid; }
+        body { background: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 450px; }
+        .header { text-align: center; border-bottom: 2px solid #1ed760; margin-bottom: 20px; padding-bottom: 10px; }
+        .header h1 { font-size: 1.5rem; color: #1ed760; margin: 0; }
+        .card { background: #1e293b; border-radius: 15px; padding: 15px; margin-bottom: 15px; border-left: 8px solid; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .brb { border-left-color: #3b82f6; }
         .utb { border-left-color: #f97316; }
-        .id-number { font-size: 1.5rem; font-weight: bold; margin: 8px 0; color: #00ff5f; font-family: monospace; letter-spacing: 1px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .btn { padding: 14px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.7rem; text-transform: uppercase; transition: 0.1s; text-align: center; text-decoration: none; }
-        .btn:active { transform: scale(0.96); opacity: 0.7; }
-        .copy-btn { background: #222; display: block; width: 100%; margin-top: 5px; border: 1px solid #333; }
-        .pix-utb { background: #f97316; color: #000; width: 100%; margin-top: 10px; }
-        .infinite { background: #1ed760; color: #000; grid-column: span 2; font-size: 0.8rem; }
+        h2 { margin: 0; font-size: 1rem; color: #94a3b8; text-transform: uppercase; }
+        .id-number { font-size: 1.6rem; font-weight: bold; margin: 10px 0; color: #fff; font-family: monospace; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.75rem; text-transform: uppercase; transition: 0.1s; text-align: center; text-decoration: none; }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        .copy-btn { background: #334155; display: block; width: 100%; margin-top: 5px; }
+        .infinite { background: #1ed760; color: #000; grid-column: span 2; }
         .inter { background: #ff7a00; } .nubank { background: #820ad1; } .itau { background: #ec7000; }
         .bradesco { background: #cc092f; } .caixa { background: #005ca9; } .santander { background: #ec0000; }
-        footer { margin-top: 20px; color: #333; font-size: 0.6rem; text-align: center; }
+        footer { margin-top: 25px; color: #475569; font-size: 0.7rem; text-align: center; }
     </style>
 </head>
 <body>
@@ -29,28 +29,26 @@
 <div class="container">
     <div class="header">
         <h1>IA MOBILIDADE</h1>
-        <small style="color: #666;">TERMINAL PB1F252F75254</small>
-    </div>
-
-    <div class="card utb">
-        <h2 style="margin:0; font-size:0.9rem; color:#888;">UTB ENTORNO</h2>
-        <div class="id-number">03620000035530 - 4</div>
-        <button class="btn copy-btn" onclick="copyAction('03620000035530', 'https://www.utb.com.br/recarga')">1. COPIAR CARTÃO E ABRIR SITE</button>
-        <button class="btn copy-btn" style="color: #f97316" onclick="copyAction('4', '')">2. COPIAR APENAS DÍGITO (4)</button>
-        
-        <button class="btn pix-utb" onclick="copyPix('00020101021226850014br.gov.bcb.pix2563qrcodepix.bb.com.br/pix/v2/709b2827-47c4-4fe1-8ecc-b6834be06fee520400005303986540550.005802BR5925UTB UNIAO TRANSPORTE BRAS6008BRASILIA62070503***6304B6CA')">
-            PAGAR PIX DIRETO (UTB UNIÃO)
-        </button>
+        <small>PROTOCOLO ATIVO - TERMINAL PB1F252F75254</small>
     </div>
 
     <div class="card brb">
-        <h2 style="margin:0; font-size:0.9rem; color:#888;">BRB MOBILIDADE</h2>
+        <h2>BRB MOBILIDADE</h2>
         <div class="id-number">1023449012</div>
-        <button class="btn copy-btn" onclick="copyAction('1023449012', 'https://mobilidade.brb.com.br')">COPIAR E ABRIR BRB</button>
+        <button class="btn copy-btn" onclick="copyAndOpen('1023449012', 'https://mobilidade.brb.com.br')">COPIAR E ABRIR RECARGA</button>
     </div>
 
+    <div class="card utb">
+        <h2>UTB ENTORNO</h2>
+        <div class="id-number">03620000035530 - 4</div>
+        <button class="btn copy-btn" onclick="copyAndOpen('03620000035530', 'https://www.utb.com.br/recarga')">COPIAR ID</button>
+        <button class="btn copy-btn" style="background:#475569" onclick="copyAndOpen('4', 'https://www.utb.com.br/recarga')">COPIAR DÍGITO (4)</button>
+    </div>
+
+    <h2 style="text-align: center; font-size: 0.8rem; margin: 20px 0 10px;">SELECIONE O BANCO PARA PAGAMENTO</h2>
+
     <div class="grid">
-        <button class="btn infinite" onclick="copyPix('00020101021226580014BR.GOV.BCB.PIX0115pay@droppfy.com0217Pagamento droppfy52040000530398654040.015802BR5925CRISTIAN RIBEIRO FLORENCI6015AGUAS LINDAS DE62290525QRCCVzF3XA7wIYGazhMXHFZnc6304631B')">PIX COPIA E COLA (CRISTIAN)</button>
+        <button class="btn infinite" onclick="copyPix('00020101021226580014BR.GOV.BCB.PIX0115pay@droppfy.com0217Pagamento droppfy52040000530398654040.015802BR5925CRISTIAN RIBEIRO FLORENCI6015AGUAS LINDAS DE62290525QRCCVzF3XA7wIYGazhMXHFZnc6304631B')">COPIAR PIX (CRISTIAN)</button>
         
         <button class="btn inter" onclick="openBank('inter')">INTER</button>
         <button class="btn nubank" onclick="openBank('nubank')">NUBANK</button>
@@ -60,18 +58,14 @@
         <button class="btn santander" onclick="openBank('santander')">SANTANDER</button>
     </div>
 
-    <footer>SISTEMA UNIFICADO V2.9</footer>
+    <footer>SISTEMA UNIFICADO V2.1 - INTEGRADO</footer>
 </div>
 
 <script>
-    function copyAction(val, url) {
-        navigator.clipboard.writeText(val).then(() => {
-            if(url !== '') {
-                alert("COPIADO: " + val + "\nAbrindo site oficial...");
-                window.location.href = url;
-            } else {
-                alert("DÍGITO " + val + " COPIADO!");
-            }
+    function copyAndOpen(id, url) {
+        navigator.clipboard.writeText(id).then(() => {
+            alert("COPIADO: " + id + "\n\nAbrindo site de recarga...");
+            window.location.href = url; 
         });
     }
 
@@ -82,7 +76,7 @@
     }
 
     function openBank(banco) {
-        const intents = {
+        const links = {
             'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
             'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
             'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
@@ -90,7 +84,8 @@
             'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
             'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
         };
-        window.location.href = intents[banco];
+        alert("ABRINDO BANCO...");
+        window.location.href = links[banco];
     }
 </script>
 
