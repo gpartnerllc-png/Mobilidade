@@ -72,6 +72,9 @@
             padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0; outline: none;
         }
         #qrcode-container { background: #fff; padding: 10px; border-radius: 10px; margin: 15px auto; width: fit-content; display: none; }
+        
+        /* Estilo para o link de redirecionamento */
+        .direct-link { color: #1ed760; display: block; margin-top: 15px; font-weight: bold; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; border-bottom: 1px solid #1ed760; padding-bottom: 2px; }
 
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; }
     </style>
@@ -87,6 +90,9 @@
         
         <button id="confirmBtn" class="btn btn-utb">CONFIRMAR</button>
         <button id="copyPixBtn" class="btn" style="display:none; background: #222;">COPIAR PIX COPIA/COLA</button>
+        
+        <a id="redirectLink" href="#" target="_blank" class="direct-link" style="display: none;">IR PARA SITE OFICIAL</a>
+        
         <button class="btn" style="background: transparent; box-shadow: none;" onclick="fecharModal()">VOLTAR</button>
     </div>
 </div>
@@ -125,7 +131,6 @@
     let activeMode = '';
     let tempID = '';
     let tempDigito = '';
-    // String base do seu Pix (conforme o Taggo enviado)
     const PIX_STR = "00020126380014BR.GOV.BCB.PIX0116pago@droppfy.com52040000530398654044.005802BR5907Partner6012Aguas Lindas62070503***6304B414";
 
     function abrirModal(mode, id, digito) {
@@ -135,6 +140,7 @@
         
         document.getElementById('qrcode-container').style.display = 'none';
         document.getElementById('copyPixBtn').style.display = 'none';
+        document.getElementById('redirectLink').style.display = 'none';
         document.getElementById('valorInput').style.display = 'block';
 
         const title = document.getElementById('modalTitle');
@@ -143,10 +149,12 @@
         if(mode === 'infinite') {
             title.innerText = "VALOR INFINITEPAY";
             btn.className = "btn infinite";
+            btn.innerText = "CONFIRMAR";
             btn.onclick = processarInfinite;
         } else {
             title.innerText = (mode === 'brb' ? "VALOR BRB" : "VALOR UTB");
             btn.className = (mode === 'brb' ? "btn btn-brb" : "btn btn-utb");
+            btn.innerText = "CONFIRMAR";
             btn.onclick = gerarFluxoTaggo;
         }
         
@@ -154,32 +162,33 @@
         document.getElementById('valorInput').focus();
     }
 
-    // MELHORIA: Lógica de geração dinâmica estilo Taggo
     function gerarFluxoTaggo() {
-        const valor = document.getElementById('valorInput').value || '4.00';
-        
-        // 1. Gerar o QR Code visual no modal
+        // 1. Gerar o QR Code visual
         const qrContainer = document.getElementById('qrcode-container');
         qrContainer.innerHTML = "";
         const qr = QRCode.generateSVG(PIX_STR, { ecclevel: "Q", fillcolor: "#FFF", textcolor: "#000", margin: 2, modulesize: 6 });
         qrContainer.appendChild(qr);
         qrContainer.style.display = 'block';
 
-        // 2. Mostrar botão de Copia e Cola
-        const copyBtn = document.getElementById('copyPixBtn');
-        copyBtn.style.display = 'block';
-        copyBtn.onclick = function() {
+        // 2. Botão Copia e Cola
+        document.getElementById('copyPixBtn').style.display = 'block';
+        document.getElementById('copyPixBtn').onclick = function() {
             navigator.clipboard.writeText(PIX_STR);
             alert("Código Pix Copiado!");
         };
 
-        // 3. O botão principal agora executa o redirecionamento com o ID na memória
+        // 3. Restaurar Link de Redirecionamento e Botão de Ação
+        const redirectLink = document.getElementById('redirectLink');
+        const finalUrl = (activeMode === 'brb') ? "https://onelink.to/mobilidade" : "https://www.utb.com.br/recarga";
+        
+        redirectLink.href = finalUrl;
+        redirectLink.style.display = 'block';
+        
         const mainBtn = document.getElementById('confirmBtn');
-        mainBtn.innerText = "ABRIR SITE E COPIAR ID";
+        mainBtn.innerText = "COPIAR ID E ABRIR SITE";
         mainBtn.onclick = function() {
             navigator.clipboard.writeText(tempID).then(() => {
-                const url = (activeMode === 'brb') ? "https://onelink.to/mobilidade" : "https://www.utb.com.br/recarga";
-                window.location.href = url;
+                window.location.href = finalUrl;
             });
         };
         
@@ -189,7 +198,6 @@
     function fecharModal() {
         document.getElementById('pixModal').style.display = 'none';
         document.getElementById('valorInput').value = '';
-        document.getElementById('confirmBtn').innerText = "CONFIRMAR";
     }
 
     function processarInfinite() {
