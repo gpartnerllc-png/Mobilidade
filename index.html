@@ -70,8 +70,7 @@
 
     <div class="card utb">
         <h2>UTB RECARGAS</h2>
-        <button class="btn btn-utb" onclick="pixUTB()">PAGAR PIX DIRETO (UTB)</button>
-        <button class="btn" style="background: #334155; margin-top: 10px;" onclick="copyID('03620000035530', '4')">COPIAR CARTÃO E ABRIR SITE</button>
+        <button class="btn btn-utb" onclick="diretoUTB('03620000035530', '4')">COPIAR ID E ABRIR SITE</button>
     </div>
 
     <div class="card brb">
@@ -94,29 +93,22 @@
 </div>
 
 <script>
+    function diretoUTB(id, digito) {
+        navigator.clipboard.writeText(id).then(() => {
+            alert("IAMOBI UTB:\nID: " + id + "\nDÍGITO: " + digito + "\n\nID COPIADO! Redirecionando...");
+            window.location.href = "https://www.utb.com.br/recarga";
+        });
+    }
+
     function copyPix(codigoPix) {
         navigator.clipboard.writeText(codigoPix).then(() => {
-            alert("PIX COPIADO!\nEscolha um banco para pagar.");
-        });
-    }
-
-    function pixUTB() {
-        const pixCodigo = "00020101021226850014br.gov.bcb.pix2563qrcodepix.bb.com.br/pix/v2/709b2827-47c4-4fe1-8ecc-b6834be06fee520400005303986540550.005802BR5925UTB UNIAO TRANSPORTE BRAS6008BRASILIA62070503***6304B6CA";
-        navigator.clipboard.writeText(pixCodigo).then(() => {
-            alert("PIX UTB COPIADO!\nUse um dos bancos abaixo para pagar.");
-        });
-    }
-
-    function copyID(id, digito) {
-        navigator.clipboard.writeText(id).then(() => {
-            alert("CARTÃO COPIADO: " + id + "\nDÍGITO: " + digito);
-            window.location.href = "https://www.utb.com.br/recarga";
+            alert("PIX COPIA E COLA COPIADO!\nEscolha um banco para pagar.");
         });
     }
 
     function smartRecarga(id) {
         navigator.clipboard.writeText(id).then(() => {
-            alert("ID BRB COPIADO!");
+            alert("SISTEMA IAMOBI:\nID BRB COPIADO!");
             window.location.href = "https://onelink.to/mobilidade";
         });
     }
