@@ -3,112 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IA MOBILIDADE - TERMINAL DE COMANDO</title>
+    <title>IAMOBI - TERMINAL 3D NEON</title>
     <style>
-        /* Estética Máquina: Fundo ultra escuro e fontes de sistema */
-        body { background: #020617; color: #f8fafc; font-family: 'Segoe UI', Roboto, Helvetica, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
+        body { 
+            background: #05070a; 
+            color: #f8fafc; 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
         .container { width: 100%; max-width: 420px; }
+
+        /* Header Gamer Neon */
+        .header { 
+            text-align: center; 
+            padding: 15px; 
+            border: 2px solid #1ed760; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 0 15px rgba(30, 215, 96, 0.4), inset 0 0 10px rgba(30, 215, 96, 0.2);
+            background: rgba(30, 215, 96, 0.05);
+        }
+        .header h1 { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 1.8rem; 
+            color: #1ed760; 
+            margin: 0; 
+            text-shadow: 0 0 10px #1ed760;
+        }
+
+        /* Estilo Cartão 3D Neon */
+        .card { 
+            background: linear-gradient(135deg, #111827 0%, #0f172a 100%); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5), -2px -2px 10px rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        /* Efeito de brilho lateral do cartão */
+        .utb { border-right: 5px solid #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.2); }
+        .brb { border-right: 5px solid #3b82f6; box-shadow: 0 0 20px rgba(59, 130, 246, 0.2); }
+
+        .id-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; }
         
-        /* Header com estilo de Painel de Controle */
-        .header { text-align: center; border: 1px solid #1ed760; background: rgba(30, 215, 96, 0.05); margin-bottom: 20px; padding: 15px; border-radius: 8px; box-shadow: 0 0 15px rgba(30, 215, 96, 0.2); }
-        .header h1 { font-size: 1.4rem; color: #1ed760; margin: 0; letter-spacing: 2px; text-transform: uppercase; }
-        .header small { color: #888; font-family: monospace; }
+        /* Números em 3D Neon */
+        .id-number { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.7rem; 
+            font-weight: 700; 
+            color: #fff; 
+            margin: 15px 0; 
+            text-shadow: 3px 3px 0px #000, 0 0 20px rgba(255,255,255,0.3);
+            display: block;
+        }
 
-        /* Cards Estilo Hardware */
-        .card { background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 15px; margin-bottom: 12px; position: relative; overflow: hidden; }
-        .card::before { content: ""; position: absolute; left: 0; top: 0; width: 4px; height: 100%; }
-        .brb::before { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
-        .utb::before { background: #f97316; box-shadow: 0 0 10px #f97316; }
+        /* Botões com Profundidade */
+        .btn { 
+            padding: 18px; 
+            border-radius: 12px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: #fff; 
+            font-size: 0.8rem; 
+            text-transform: uppercase; 
+            width: 100%; 
+            margin-top: 8px;
+            box-shadow: 0 5px 0px rgba(0,0,0,0.4);
+            transition: 0.1s;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0px rgba(0,0,0,0.4); }
 
-        h2 { margin: 0; font-size: 0.85rem; color: #94a3b8; font-weight: 400; }
-        .id-number { font-size: 1.8rem; font-weight: 700; margin: 8px 0; color: #fff; font-family: 'Courier New', Courier, monospace; letter-spacing: 1px; }
+        .btn-utb { background: linear-gradient(to bottom, #f97316, #c2410c); }
+        .btn-brb { background: linear-gradient(to bottom, #3b82f6, #1d4ed8); }
+        .btn-digit { background: #1e293b; border: 1px solid #334155; }
 
-        /* Botões Poderosos */
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        .btn { padding: 16px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; text-align: center; flex: 1; }
-        .btn:active { transform: scale(0.96); filter: brightness(1.2); }
+        /* Grid de Bancos */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .infinite { 
+            background: linear-gradient(to bottom, #1ed760, #15803d); 
+            color: #000; 
+            grid-column: span 2; 
+            box-shadow: 0 5px 0px #065f46;
+        }
+        .bank { background: #111827; border: 1px solid #334155; box-shadow: 0 4px 0px #000; }
 
-        .btn-main { background: #334155; border: 1px solid #475569; }
-        .btn-digit { background: #1e293b; border: 1px solid #3b82f6; max-width: 80px; color: #3b82f6; }
-
-        /* Grid de Bancos estilo Teclado Numérico */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .infinite { background: #1ed760; color: #000; grid-column: span 2; font-size: 0.9rem; }
-        .inter { background: #ff7a00; } .nubank { background: #820ad1; } .itau { background: #ec7000; }
-        .bradesco { background: #cc092f; } .caixa { background: #005ca9; } .santander { background: #ec0000; }
-
-        footer { margin-top: 20px; color: #444; font-size: 0.65rem; font-family: monospace; text-transform: uppercase; }
+        footer { margin-top: 30px; font-size: 0.7rem; color: #444; font-family: monospace; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>IA MOBILIDADE</h1>
-        <small>SISTEMA DE ALTA AUTORIDADE</small>
+        <h1>IAMOBI</h1>
+        <small style="color:#1ed760">SYSTEM ONLINE V3.2</small>
     </div>
-
+    
     <div class="card utb">
-        <h2>RECARGA UTB ENTORNO</h2>
-        <div class="id-number">03620000035530</div>
-        <div class="btn-group">
-            <button class="btn btn-main" onclick="copyAction('03620000035530', 'https://www.utb.com.br/recarga')">COPIAR CARTÃO</button>
-            <button class="btn btn-digit" onclick="copyAction('4', '')">DÍG. 4</button>
-        </div>
+        <span class="id-label">Terminal UTB Entorno</span>
+        <div class="id-number">03620000035530 - 4</div>
+        <button class="btn btn-utb" onclick="copyGo('03620000035530', 'https://www.utb.com.br/recarga')">COPIAR E ABRIR UTB</button>
+        <button class="btn btn-digit" onclick="copyGo('4', '')">COPIAR DÍGITO (4)</button>
     </div>
 
     <div class="card brb">
-        <h2>RECARGA BRB MOBILIDADE</h2>
+        <span class="id-label">Terminal BRB Mobilidade</span>
         <div class="id-number">1023449012</div>
-        <button class="btn btn-main" style="width: 100%;" onclick="copyAction('1023449012', 'https://onelink.to/mobilidade')">COPIAR E ABRIR BRB</button>
-    </div>
-
-    <div style="background: #1e293b; padding: 5px 15px; border-radius: 20px; margin: 15px 0;">
-        <h2 style="text-align: center; color: #1ed760; font-size: 0.7rem; font-weight: bold;">GATEWAY DE PAGAMENTO ATIVO</h2>
+        <button class="btn btn-brb" onclick="copyGo('1023449012', 'https://mobilidade.brb.com.br')">COPIAR E ABRIR BRB</button>
     </div>
 
     <div class="grid">
-        <button class="btn infinite" onclick="openBank('https://link.infinitepay.io/recarga')">PAGAR VIA INFINITEPAY</button>
-        <button class="btn inter" onclick="openBank('inter')">INTER</button>
-        <button class="btn nubank" onclick="openBank('nubank')">NUBANK</button>
-        <button class="btn itau" onclick="openBank('itau')">ITAÚ</button>
-        <button class="btn bradesco" onclick="openBank('bradesco')">BRADESCO</button>
-        <button class="btn caixa" onclick="openBank('caixa')">CAIXA</button>
-        <button class="btn santander" onclick="openBank('santander')">SANTANDER</button>
+        <button class="btn infinite" onclick="window.location.href='https://link.infinitepay.io/recarga'">INFINITEPAY NEON</button>
+        <button class="btn bank" onclick="openBank('nubank')">NUBANK</button>
+        <button class="btn bank" onclick="openBank('inter')">INTER</button>
+        <button class="btn bank" onclick="openBank('itau')">ITAÚ</button>
+        <button class="btn bank" onclick="openBank('bradesco')">BRADESCO</button>
     </div>
 
-    <footer>PROTOCOLO: PB1F252F75254 | VERSION 3.0</footer>
+    <footer>OPERATIONAL PROTOCOL: PB1F252F75254</footer>
 </div>
 
 <script>
-    function copyAction(val, url) {
-        navigator.clipboard.writeText(val).then(() => {
-            if(url !== '') {
-                // Se for o botão principal, avisa e leva ao site
-                alert("COMANDO ENVIADO: ID " + val + " NA MEMÓRIA.");
-                window.location.href = url;
-            } else {
-                // Se for apenas o dígito, dá um feedback mais simples para não sair do site da UTB
-                alert("DÍGITO " + val + " COPIADO!");
-            }
+    function copyGo(id, url) {
+        navigator.clipboard.writeText(id).then(() => {
+            alert("COMANDO EXECUTADO: " + id + " COPIADO.");
+            if(url) window.location.href = url;
         });
     }
 
     function openBank(banco) {
-        const links = {
-            'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
+        const intents = {
             'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
+            'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
             'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
-            'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
-            'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
-            'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
+            'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end'
         };
-
-        if(banco.startsWith('http')) {
-            window.location.href = banco;
-        } else {
-            window.location.href = links[banco];
-        }
+        window.location.href = intents[banco];
     }
 </script>
 
