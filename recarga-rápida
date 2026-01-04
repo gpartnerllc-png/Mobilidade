@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IAMOBI - TERMINAL PREMIUM</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
+        body { 
+            background: #02040a; 
+            color: #f8fafc; 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .container { width: 100%; max-width: 420px; }
+
+        .header { 
+            text-align: center; 
+            padding: 20px; 
+            border-bottom: 2px solid #1ed760; 
+            margin-bottom: 30px; 
+        }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: #1ed760; margin: 0; text-shadow: 0 0 15px rgba(30, 215, 96, 0.5); }
+
+        /* Card Estilo Vidro Premium */
+        .card { 
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 { margin: 0 0 10px 0; font-size: 1.2rem; color: #fff; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* Botão 3D Ultra */
+        .btn { 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: #fff; 
+            font-size: 0.9rem; 
+            text-transform: uppercase; 
+            width: 100%;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 8px 0px rgba(0,0,0,0.3);
+            transition: 0.1s;
+            letter-spacing: 1px;
+        }
+        .btn:active { transform: translateY(4px); box-shadow: 0 4px 0px rgba(0,0,0,0.3); }
+
+        /* Cores Neon 3D */
+        .btn-utb { 
+            background: linear-gradient(180deg, #f97316 0%, #c2410c 100%); 
+            box-shadow: 0 8px 0px #7c2d12, 0 0 20px rgba(249, 115, 22, 0.3);
+        }
+        .btn-brb { 
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%); 
+            box-shadow: 0 8px 0px #1e3a8a, 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .gateway-title { font-size: 0.8rem; color: #1ed760; font-family: 'Orbitron', sans-serif; margin: 20px 0 10px; text-align: center; opacity: 0.8; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .infinite { 
+            background: linear-gradient(180deg, #1ed760 0%, #166534 100%); 
+            color: #000; 
+            grid-column: span 2; 
+            box-shadow: 0 6px 0px #064e3b;
+        }
+        .bank { 
+            background: #111827; 
+            border: 1px solid #1e293b; 
+            box-shadow: 0 6px 0px #000; 
+            font-size: 0.7rem;
+        }
+
+        footer { margin-top: 40px; color: #334155; font-size: 0.7rem; font-family: monospace; letter-spacing: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>IAMOBI</h1>
+    </div>
+
+    <div class="card">
+        <h2>UTB RECARGAS</h2>
+        <button class="btn btn-utb" onclick="copyAction('03620000035530', 'https://www.utb.com.br/recarga')">ACESSAR TERMINAL UTB</button>
+    </div>
+
+    <div class="card">
+        <h2>BRB MOBI</h2>
+        <button class="btn btn-brb" onclick="copyAction('1023449012', 'https://onelink.to/mobilidade')">ACESSAR TERMINAL BRB</button>
+    </div>
+
+    <div class="gateway-title">MODO DE PAGAMENTO SEGURO</div>
+
+    <div class="grid">
+        <button class="btn infinite" onclick="openBank('https://link.infinitepay.io/recarga')">INFINITEPAY</button>
+        <button class="btn bank" onclick="openBank('inter')">INTER</button>
+        <button class="btn bank" onclick="openBank('nubank')">NUBANK</button>
+        <button class="btn bank" onclick="openBank('itau')">ITAÚ</button>
+        <button class="btn bank" onclick="openBank('bradesco')">BRADESCO</button>
+        <button class="btn bank" onclick="openBank('caixa')">CAIXA</button>
+        <button class="btn bank" onclick="openBank('santander')">SANTANDER</button>
+    </div>
+
+    <footer>V3.5 | ENCRYPTED SYSTEM</footer>
+</div>
+
+<script>
+    function copyAction(val, url) {
+        navigator.clipboard.writeText(val).then(() => {
+            alert("SISTEMA IAMOBI:\nID COPIADO COM SUCESSO!");
+            window.location.href = url;
+        });
+    }
+
+    function openBank(banco) {
+        const links = {
+            'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
+            'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
+            'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
+            'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
+            'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
+            'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
+        };
+        if(banco.startsWith('http')) {
+            window.location.href = banco;
+        } else {
+            window.location.href = links[banco];
+        }
+    }
+</script>
+
+</body>
+</html>
