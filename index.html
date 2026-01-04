@@ -50,12 +50,7 @@
             color: #000; grid-column: span 2; box-shadow: 0 5px 0px #065f46; 
         }
 
-        .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
-        .btn-nubank { background: #820ad1; box-shadow: 0 5px 0px #4c067a; }
-        .btn-itau { background: #ec7000; box-shadow: 0 5px 0px #a04d00; }
-        .btn-bradesco { background: #cc092f; box-shadow: 0 5px 0px #8a0620; }
-        .btn-caixa { background: #005ca9; box-shadow: 0 5px 0px #003e73; }
-        .btn-santander { background: #ec0000; box-shadow: 0 5px 0px #a00000; }
+        .btn-bank { background: #1a1a1a; font-size: 0.7rem; box-shadow: 0 5px 0px #000; }
 
         #pixModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -73,7 +68,7 @@
         #qrcode-container { background: #fff; padding: 10px; border-radius: 10px; margin: 15px auto; width: fit-content; display: none; }
         
         .direct-link-box { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .direct-link { color: #1ed760; text-decoration: none; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .direct-link { color: #1ed760; text-decoration: underline; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; }
 
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; }
     </style>
@@ -88,13 +83,14 @@
         <div id="qrcode-container"></div>
         
         <button id="confirmBtn" class="btn">CONFIRMAR</button>
-        <button id="copyPixBtn" class="btn" style="display:none; background: #222; box-shadow: 0 5px 0 #000;">COPIAR PIX COPIA/COLA</button>
+        <button id="copyPixBtn" class="btn" style="display:none; background: #222;">COPIAR PIX COPIA/COLA</button>
         
         <div class="direct-link-box" id="linkContainer" style="display:none;">
-            <a id="siteRedirect" href="#" target="_blank" class="direct-link">🔗 ACESSAR SITE DE RECARGA</a>
+            <p style="font-size: 0.7rem; color: #888; margin-bottom: 5px;">OU ACESSE DIRETAMENTE:</p>
+            <a id="siteRedirect" href="#" target="_blank" class="direct-link">SITE DE RECARGA OFICIAL</a>
         </div>
         
-        <button class="btn" style="background: transparent; box-shadow: none;" onclick="fecharModal()">VOLTAR</button>
+        <button class="btn" style="background: transparent; box-shadow: none;" onclick="fecharModal()">CANCELAR</button>
     </div>
 </div>
 
@@ -116,12 +112,12 @@
 
     <div class="grid">
         <button class="btn infinite" onclick="abrirModal('infinite', 'https://link.infinitepay.io/recarga', '')">PAGAR VIA INFINITEPAY</button>
-        <button class="btn btn-inter" onclick="openBank('inter')">INTER</button>
-        <button class="btn btn-nubank" onclick="openBank('nubank')">NUBANK</button>
-        <button class="btn btn-itau" onclick="openBank('itau')">ITAÚ</button>
-        <button class="btn btn-bradesco" onclick="openBank('bradesco')">BRADESCO</button>
-        <button class="btn btn-caixa" onclick="openBank('caixa')">CAIXA</button>
-        <button class="btn btn-santander" onclick="openBank('santander')">SANTANDER</button>
+        <button class="btn btn-bank" onclick="openBank('inter')">INTER</button>
+        <button class="btn btn-bank" onclick="openBank('nubank')">NUBANK</button>
+        <button class="btn btn-bank" onclick="openBank('itau')">ITAÚ</button>
+        <button class="btn btn-bank" onclick="openBank('bradesco')">BRADESCO</button>
+        <button class="btn btn-bank" onclick="openBank('caixa')">CAIXA</button>
+        <button class="btn btn-bank" onclick="openBank('santander')">SANTANDER</button>
     </div>
 
     <footer>SISTEMA CRIPTOGRAFADO | PROTOCOLO V5.1</footer>
@@ -131,14 +127,15 @@
 <script>
     let activeMode = '';
     let tempID = '';
-    let tempURL = '';
+    let currentLink = '';
     const PIX_STR = "00020126380014BR.GOV.BCB.PIX0116pago@droppfy.com52040000530398654044.005802BR5907Partner6012Aguas Lindas62070503***6304B414";
 
-    function abrirModal(mode, id, url) {
+    function abrirModal(mode, id, link) {
         activeMode = mode;
         tempID = id;
-        tempURL = url;
+        currentLink = link;
         
+        // Reset do modal
         document.getElementById('qrcode-container').style.display = 'none';
         document.getElementById('copyPixBtn').style.display = 'none';
         document.getElementById('linkContainer').style.display = 'none';
@@ -149,13 +146,11 @@
         
         if(mode === 'infinite') {
             title.innerText = "VALOR INFINITEPAY";
-            btn.className = "btn infinite";
             btn.innerText = "CONFIRMAR";
             btn.onclick = processarInfinite;
         } else {
             title.innerText = (mode === 'brb' ? "VALOR BRB" : "VALOR UTB");
-            btn.className = (mode === 'brb' ? "btn btn-brb" : "btn btn-utb");
-            btn.innerText = "CONFIRMAR";
+            btn.innerText = "GERAR QR CODE";
             btn.onclick = gerarFluxoTaggo;
         }
         
@@ -164,31 +159,33 @@
     }
 
     function gerarFluxoTaggo() {
-        // 1. Gerar o QR Code
+        // 1. Gera o QR Code
         const qrContainer = document.getElementById('qrcode-container');
         qrContainer.innerHTML = "";
         const qr = QRCode.generateSVG(PIX_STR, { ecclevel: "Q", fillcolor: "#FFF", textcolor: "#000", margin: 2, modulesize: 6 });
         qrContainer.appendChild(qr);
         qrContainer.style.display = 'block';
 
-        // 2. Mostrar Botões Extras e Link
-        document.getElementById('copyPixBtn').style.display = 'block';
+        // 2. Configura e mostra o link de redirecionamento
+        const redirect = document.getElementById('siteRedirect');
+        redirect.href = currentLink;
         document.getElementById('linkContainer').style.display = 'block';
-        document.getElementById('siteRedirect').href = tempURL;
-        
-        // 3. Configurar Botão Principal para Copiar e Abrir
-        const mainBtn = document.getElementById('confirmBtn');
-        mainBtn.innerText = "COPIAR ID E ABRIR SITE";
-        
-        mainBtn.onclick = function() {
-            navigator.clipboard.writeText(tempID).then(() => {
-                window.location.href = tempURL;
-            });
+
+        // 3. Mostra o botão Copia e Cola
+        const copyBtn = document.getElementById('copyPixBtn');
+        copyBtn.style.display = 'block';
+        copyBtn.onclick = function() {
+            navigator.clipboard.writeText(PIX_STR);
+            alert("Pix Copia e Cola na memória!");
         };
 
-        document.getElementById('copyPixBtn').onclick = function() {
-            navigator.clipboard.writeText(PIX_STR);
-            alert("Código Pix Copiado!");
+        // 4. Muda o botão principal para Copiar ID e Redirecionar
+        const mainBtn = document.getElementById('confirmBtn');
+        mainBtn.innerText = "COPIAR ID E IR PRO SITE";
+        mainBtn.onclick = function() {
+            navigator.clipboard.writeText(tempID).then(() => {
+                window.open(currentLink, '_blank');
+            });
         };
         
         document.getElementById('valorInput').style.display = 'none';
