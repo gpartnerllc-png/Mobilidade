@@ -45,27 +45,33 @@
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         
+        /* INFINITEPAY COM EFEITO PREMIUM */
         .infinite { 
             background: linear-gradient(to bottom, #1ed760, #15803d); 
             color: #000; grid-column: span 2; box-shadow: 0 5px 0px #065f46; 
         }
 
-        .btn-bank { background: #1a1a1a; box-shadow: 0 5px 0px #000; font-size: 0.75rem; }
+        .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
+        .btn-nubank { background: #820ad1; box-shadow: 0 5px 0px #4c067a; }
+        .btn-itau { background: #ec7000; box-shadow: 0 5px 0px #a04d00; }
+        .btn-bradesco { background: #cc092f; box-shadow: 0 5px 0px #8a0620; }
+        .btn-caixa { background: #005ca9; box-shadow: 0 5px 0px #003e73; }
+        .btn-santander { background: #ec0000; box-shadow: 0 5px 0px #a30000; }
 
+        /* Modal Integrado */
         #pixModal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); z-index: 9999; align-items: center; justify-content: center;
         }
         .modal-content {
-            background: #0f172a; border: 1px solid #1ed760; padding: 25px; border-radius: 20px;
+            background: #0f172a; border: 1px solid #1ed760; padding: 30px; border-radius: 20px;
             width: 85%; max-width: 350px; text-align: center;
         }
         .input-pix {
             background: rgba(255,255,255,0.05); border: 1px solid #334155; color: #1ed760;
             font-family: 'Orbitron', sans-serif; font-size: 1.5rem; width: 100%;
-            padding: 15px; border-radius: 10px; text-align: center; margin: 10px 0; outline: none;
+            padding: 15px; border-radius: 10px; text-align: center; margin: 20px 0; outline: none;
         }
-        #qrcode-container { background: #fff; padding: 10px; border-radius: 10px; margin: 15px auto; width: fit-content; display: none; }
 
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; }
     </style>
@@ -75,12 +81,8 @@
 <div id="pixModal">
     <div class="modal-content">
         <h2 id="modalTitle" style="color: #1ed760;">VALOR OPERAÇÃO</h2>
-        <input type="number" id="valorInput" class="input-pix" placeholder="0.00">
-        
-        <div id="qrcode-container"></div>
-        
-        <button id="confirmBtn" class="btn">CONFIRMAR</button>
-        <button id="copyPixBtn" class="btn" style="display:none; background: #222;">COPIAR PIX COPIA/COLA</button>
+        <input type="number" id="valorInput" class="input-pix" placeholder="0.00" step="0.01">
+        <button id="confirmBtn" class="btn btn-utb">CONFIRMAR</button>
         <button class="btn" style="background: transparent; box-shadow: none;" onclick="fecharModal()">VOLTAR</button>
     </div>
 </div>
@@ -93,89 +95,85 @@
 
     <div class="card utb">
         <h2>UTB RECARGAS</h2>
-        <button class="btn btn-utb" onclick="abrirModal('utb', '03620000035530', 'https://www.utb.com.br/recarga')">EXECUTAR RECARGA PIX</button>
+        <button class="btn btn-utb" onclick="abrirModal('utb', '03620000035530', '4')">EXECUTAR RECARGA PIX</button>
     </div>
 
     <div class="card brb">
         <h2>BRB MOBI</h2>
-        <button class="btn btn-brb" onclick="abrirModal('brb', '1023449012', 'https://onelink.to/mobilidade')">ABRIR TERMINAL BRB</button>
+        <button class="btn btn-brb" onclick="smartRecarga('1023449012', '', 'brb')">ABRIR TERMINAL BRB</button>
     </div>
 
     <div class="grid">
         <button class="btn infinite" onclick="abrirModal('infinite', 'https://link.infinitepay.io/recarga', '')">PAGAR VIA INFINITEPAY</button>
-        <button class="btn btn-bank" onclick="openBank('inter')">INTER</button>
-        <button class="btn btn-bank" onclick="openBank('nubank')">NUBANK</button>
-        <button class="btn btn-bank" onclick="openBank('itau')">ITAÚ</button>
-        <button class="btn btn-bank" onclick="openBank('bradesco')">BRADESCO</button>
-        <button class="btn btn-bank" onclick="openBank('caixa')">CAIXA</button>
-        <button class="btn btn-bank" onclick="openBank('santander')">SANTANDER</button>
+        
+        <button class="btn btn-inter" onclick="openBank('inter')">INTER</button>
+        <button class="btn btn-nubank" onclick="openBank('nubank')">NUBANK</button>
+        <button class="btn btn-itau" onclick="openBank('itau')">ITAÚ</button>
+        <button class="btn btn-bradesco" onclick="openBank('bradesco')">BRADESCO</button>
+        <button class="btn btn-caixa" onclick="openBank('caixa')">CAIXA</button>
+        <button class="btn btn-santander" onclick="openBank('santander')">SANTANDER</button>
     </div>
 
     <footer>SISTEMA CRIPTOGRAFADO | PROTOCOLO V5.1</footer>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrjs2@0.1.7/qrjs2.min.js"></script>
 <script>
     let activeMode = '';
     let tempID = '';
-    let tempURL = '';
-    const PIX_STR = "00020126380014BR.GOV.BCB.PIX0116pago@droppfy.com52040000530398654044.005802BR5907Partner6012Aguas Lindas62070503***6304B414";
+    let tempDigito = '';
 
-    function abrirModal(mode, id, url) {
+    function abrirModal(mode, id, digito) {
         activeMode = mode;
         tempID = id;
-        tempURL = url;
+        tempDigito = digito;
         
-        document.getElementById('qrcode-container').style.display = 'none';
-        document.getElementById('copyPixBtn').style.display = 'none';
-        document.getElementById('valorInput').style.display = 'block';
-
         const title = document.getElementById('modalTitle');
         const btn = document.getElementById('confirmBtn');
         
         if(mode === 'infinite') {
             title.innerText = "VALOR INFINITEPAY";
-            btn.onclick = function() {
-                let valor = document.getElementById('valorInput').value;
-                window.location.href = tempID + (valor ? "/" + valor : "");
-            };
+            btn.className = "btn infinite";
+            btn.onclick = processarInfinite;
         } else {
-            title.innerText = (mode === 'brb' ? "VALOR BRB" : "VALOR UTB");
-            btn.innerText = "CONFIRMAR";
-            btn.onclick = gerarTaggo;
+            title.innerText = "VALOR UTB";
+            btn.className = "btn btn-utb";
+            btn.onclick = processarUTB;
         }
+        
         document.getElementById('pixModal').style.display = 'flex';
-    }
-
-    function gerarTaggo() {
-        // Gera o QR Code visual
-        const qrContainer = document.getElementById('qrcode-container');
-        qrContainer.innerHTML = "";
-        const qr = QRCode.generateSVG(PIX_STR, { ecclevel: "Q", fillcolor: "#FFF", textcolor: "#000", margin: 2, modulesize: 6 });
-        qrContainer.appendChild(qr);
-        qrContainer.style.display = 'block';
-
-        // Mostra o botão de cópia
-        document.getElementById('copyPixBtn').style.display = 'block';
-        document.getElementById('copyPixBtn').onclick = () => {
-            navigator.clipboard.writeText(PIX_STR);
-            alert("Pix copiado!");
-        };
-
-        // O botão confirmar agora abre o seu link original
-        const btn = document.getElementById('confirmBtn');
-        btn.innerText = "IR PARA SITE DE RECARGA";
-        btn.onclick = function() {
-            navigator.clipboard.writeText(tempID).then(() => {
-                window.open(tempURL, '_blank');
-            });
-        };
-        document.getElementById('valorInput').style.display = 'none';
+        document.getElementById('valorInput').focus();
     }
 
     function fecharModal() {
         document.getElementById('pixModal').style.display = 'none';
-        document.getElementById('confirmBtn').innerText = "CONFIRMAR";
+        document.getElementById('valorInput').value = '';
+    }
+
+    function processarUTB() {
+        const valor = document.getElementById('valorInput').value || '0.00';
+        navigator.clipboard.writeText(tempID).then(() => {
+            alert("IAMOBI PROTOCOLO:\nID: " + tempID + "\nDÍGITO: " + tempDigito + "\nVALOR: R$ " + valor + "\n\nCOPIADO!");
+            window.location.href = "https://www.utb.com.br/recarga";
+        });
+    }
+
+    function processarInfinite() {
+        const valor = document.getElementById('valorInput').value;
+        let finalUrl = tempID; // base url: https://link.infinitepay.io/recarga
+        
+        if(valor && valor > 0) {
+            // Se houver valor, injeta no link da InfinitePay
+            finalUrl += "/" + valor;
+            alert("IAMOBI INFINITE:\nVALOR R$ " + valor + " CONFIGURADO.\n\nREDIRECIONANDO...");
+        }
+        window.location.href = finalUrl;
+    }
+
+    function smartRecarga(id, digito, tipo) {
+        navigator.clipboard.writeText(id).then(() => {
+            alert("SISTEMA IAMOBI:\nID " + id + " COPIADO!");
+            window.location.href = "https://onelink.to/mobilidade";
+        });
     }
 
     function openBank(banco) {
@@ -183,12 +181,15 @@
             'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
             'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
             'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
-            'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;end',
+            'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
             'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
             'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
         };
         window.location.href = links[banco];
     }
 </script>
+
 </body>
 </html>
+
+
