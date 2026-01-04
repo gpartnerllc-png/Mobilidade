@@ -40,9 +40,8 @@
         }
         .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.5); }
         
-        /* Cores dos Botões Mantidas */
         .btn-utb { background: linear-gradient(to bottom, #f97316, #c2410c); }
-        .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); text-shadow: 0 0 5px #fff; } /* Estilo Robô */
+        .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); text-shadow: 0 0 5px #fff; } 
         .btn-saldo { background: linear-gradient(to bottom, #475569, #1e293b); border: 1px solid rgba(255,255,255,0.1); }
         .btn-brb { background: linear-gradient(to bottom, #3b82f6, #1d4ed8); }
 
@@ -99,7 +98,7 @@
 </div>
 
 <script>
-    // --- INTEGRAÇÃO COM O ROBÔ PYTHON ---
+    // --- INTEGRAÇÃO COM O ROBÔ PYTHON (ATUALIZADO COM SEU IP DE REDE) ---
     async function gerarPixAutomatico(cartao, digito) {
         const btn = document.getElementById('btn-automacao');
         const originalText = btn.innerText;
@@ -108,8 +107,8 @@
         btn.style.opacity = "0.7";
 
         try {
-            // LEMBRE-SE: Troque o IP abaixo pelo IP do seu computador na rede
-            const response = await fetch('http://localhost:5000/gerar_pix', {
+            // Rota atualizada para o seu IP real: 192.168.100.2 na porta 5000
+            const response = await fetch('http://192.168.100.2:5000/gerar_pix', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ cartao: cartao, digito: digito })
@@ -128,13 +127,12 @@
                 btn.style.opacity = "1";
             }
         } catch (err) {
-            alert("ERRO DE CONEXÃO:\nO servidor Python está ligado no PC?\nCertifique-se que o IP está correto.");
+            alert("ERRO DE CONEXÃO:\n\n1. O computador está com o servidor Python ligado?\n2. O celular está no mesmo Wi-Fi que o PC?");
             btn.innerText = originalText;
             btn.style.opacity = "1";
         }
     }
 
-    // --- FUNÇÕES ORIGINAIS MANTIDAS ---
     function diretoUTB(id, digito) {
         navigator.clipboard.writeText(id).then(() => {
             alert("IAMOBI UTB:\nID: " + id + "\nDÍGITO: " + digito + "\n\nID COPIADO! Redirecionando...");
