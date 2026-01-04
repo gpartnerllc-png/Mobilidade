@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA INTEGRADO V5.2</title>
+    <title>IAMOBI - SISTEMA INTEGRADO V6.0</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
 
@@ -40,7 +40,9 @@
         }
         .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.5); }
         
+        /* Cores dos Botões Mantidas */
         .btn-utb { background: linear-gradient(to bottom, #f97316, #c2410c); }
+        .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); text-shadow: 0 0 5px #fff; } /* Estilo Robô */
         .btn-saldo { background: linear-gradient(to bottom, #475569, #1e293b); border: 1px solid rgba(255,255,255,0.1); }
         .btn-brb { background: linear-gradient(to bottom, #3b82f6, #1d4ed8); }
 
@@ -58,7 +60,7 @@
         .btn-caixa { background: #005ca9; box-shadow: 0 5px 0px #003e73; }
         .btn-santander { background: #ec0000; box-shadow: 0 5px 0px #a30000; }
 
-        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; }
+        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; text-align: center;}
     </style>
 </head>
 <body>
@@ -71,6 +73,8 @@
 
     <div class="card utb">
         <h2>UTB RECARGAS</h2>
+        <button id="btn-automacao" class="btn btn-robot" onclick="gerarPixAutomatico('03620000035530', '4')">🤖 GERAR PIX AUTOMÁTICO</button>
+        
         <button class="btn btn-utb" onclick="diretoUTB('03620000035530', '4')">COPIAR ID E ABRIR SITE</button>
         <button class="btn btn-saldo" onclick="window.location.href='https://www.utb.com.br/consulta-saldo'">CONSULTAR SALDO UTB</button>
     </div>
@@ -91,10 +95,46 @@
         <button class="btn btn-santander" onclick="openBank('santander')">SANTANDER</button>
     </div>
 
-    <footer>SISTEMA  | CRIPTOGRAFADO</footer>
+    <footer>SISTEMA CRIPTOGRAFADO | PROTOCOLO V6.0</footer>
 </div>
 
 <script>
+    // --- INTEGRAÇÃO COM O ROBÔ PYTHON ---
+    async function gerarPixAutomatico(cartao, digito) {
+        const btn = document.getElementById('btn-automacao');
+        const originalText = btn.innerText;
+        
+        btn.innerText = "🤖 ACESSANDO SERVIDOR...";
+        btn.style.opacity = "0.7";
+
+        try {
+            // LEMBRE-SE: Troque o IP abaixo pelo IP do seu computador na rede
+            const response = await fetch('http://localhost:5000/gerar_pix', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ cartao: cartao, digito: digito })
+            });
+
+            const data = await response.json();
+
+            if (data.status === "sucesso") {
+                await navigator.clipboard.writeText(data.pix);
+                alert("SUCESSO ABSOLUTO!\n\nPix da UTB capturado pelo robô e copiado para sua área de transferência.");
+                btn.innerText = "✅ PIX COPIADO!";
+                setTimeout(() => { btn.innerText = originalText; btn.style.opacity = "1"; }, 3000);
+            } else {
+                alert("Falha na Automação: " + data.mensagem);
+                btn.innerText = originalText;
+                btn.style.opacity = "1";
+            }
+        } catch (err) {
+            alert("ERRO DE CONEXÃO:\nO servidor Python está ligado no PC?\nCertifique-se que o IP está correto.");
+            btn.innerText = originalText;
+            btn.style.opacity = "1";
+        }
+    }
+
+    // --- FUNÇÕES ORIGINAIS MANTIDAS ---
     function diretoUTB(id, digito) {
         navigator.clipboard.writeText(id).then(() => {
             alert("IAMOBI UTB:\nID: " + id + "\nDÍGITO: " + digito + "\n\nID COPIADO! Redirecionando...");
