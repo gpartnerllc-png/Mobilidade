@@ -3,6 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IAMOBI - SISTEMA INTEGRADO V4.0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+
+        body { 
+            background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; 
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; 
+        }
+
+        .container { width: 100%; max-width: 420px; }
+
+        /* Header com Neon Pulsante */
+        .header { 
+            text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; 
+            margin-bottom: 25px; background: rgba(30, 215, 96, 0.02);
+            box-shadow: 0 0 20px rgba(30, 215, 96, 0.1);
+        }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; text-shadow: 0 0 10px #1ed760; }
+
+        /* Card de Recarga Rápida (Smart Link) */
+        .card { 
+            background: linear-gradient(145deg, #0f172a 0%, #020617 100%); 
+            border-radius: 24px; padding: 25px; margin-bottom: 15px; 
+            border: 1px solid rgba(255,255,255,0.05); box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
+        }
+        .utb { border-left: 4px solid #f97316; }
+        .brb { border-left: 4px solid #3b82f6; }
+
+        h2 { margin: 0; font-size: 1rem; color: #fff; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; }
+        
+        /* Input Estilo Máquina */
+        .input-box {
+            margin-top: 15px; background: rgba(255,255,255,0.03); border: 1px solid #334155;
+            padding: 12px; border-radius: 10px; display: flex; align-items: center;
+        }
+        .input-box input {
+            background: transparent; border: none; color: #1ed760; font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem; width: 100%; text-align: center; outline: none;
+        }
+
+        /* Botão 3D de Alta Performance */
+        .btn { 
+            padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; 
+            color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; 
+            font-family: 'Orbitron', sans-serif; transition: 0.1s; margin-top: 15px;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.5);
+        }
+        .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.5); }
+        .btn-utb { background: linear-gradient(to bottom, #f97316, #c2410c); }
+        .btn-brb { background: linear-gradient(to bottom, #3b82f6, #1d4ed8); }
+
+        /* Grid de Bancos (Seu Comando Original) */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .infinite { 
+            background: linear-gradient(to bottom, #1ed760, #15803d); color: #000; 
+            grid-column: span 2; box-shadow: 0 5px 0px #065f46;
+        }
+        .bank { background: #111827; border: 1px solid #1e293b; box-shadow: 0 5px 0px #000; }
+
+        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>IAMOBI</h1>
+        <small style="color:#1ed760">INTEGRAÇÃO DIRETA ATIVA</small>
+    </div>
+
+    <div class="card utb">
+        <h2>UTB RECARGAS</h2>
+        <div class="input-box">
+            <span style="color:#64748b; margin-right:5px">R$</span>
+            <input type="number" id="valor_utb" placeholder="0,00" value="50.00">
+        </div>
+        <button class="btn btn-utb" onclick="smartRecarga('03620000035530', '4', 'utb')">EXECUTAR RECARGA PIX</button>
+    </div>
+
+    <div class="card brb">
+        <h2>BRB MOBI</h2>
+        <button class="btn btn-brb" onclick="smartRecarga('1023449012', '', 'brb')">ABRIR TERMINAL BRB</button>
+    </div>
+
+    <div class="grid">
+        <button class="btn infinite" onclick="openBank('https://link.infinitepay.io/recarga')">PAGAR VIA INFINITEPAY</button>
+        <button class="btn bank" onclick="openBank('inter')">INTER</button>
+        <button class="btn bank" onclick="openBank('nubank')">NUBANK</button>
+        <button class="btn bank" onclick="openBank('itau')">ITAÚ</button>
+        <button class="btn bank" onclick="openBank('bradesco')">BRADESCO</button>
+        <button class="btn bank" onclick="openBank('caixa')">CAIXA</button>
+        <button class="btn bank" onclick="openBank('santander')">SANTANDER</button>
+    </div>
+
+    <footer>SISTEMA CRIPTOGRAFADO | PROTOCOLO PB1F252F75254</footer>
+</div>
+
+<script>
+    // Função que une os dois comandos de forma inteligente
+    function smartRecarga(id, digito, tipo) {
+        // Copia o ID principal para a área de transferência
+        navigator.clipboard.writeText(id).then(() => {
+            if (tipo === 'utb') {
+                const valor = document.getElementById('valor_utb').value;
+                alert("SISTEMA IAMOBI:\nID: " + id + "\nDÍGITO: " + digito + "\nVALOR: R$ " + valor + "\n\nCOPIADO! REDIRECIONANDO...");
+                // Envia para o site de recarga da UTB
+                window.location.href = "https://www.utb.com.br/recarga";
+            } else {
+                alert("SISTEMA IAMOBI:\nID " + id + " COPIADO!");
+                window.location.href = "https://onelink.to/mobilidade";
+            }
+        });
+    }
+
+    function openBank(banco) {
+        const links = {
+            'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
+            'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
+            'itau': 'intent://#Intent;scheme=itau;package=com.itau;end',
+            'bradesco': 'intent://#Intent;scheme=bradesco;package=com.bradesco;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end',
+            'caixa': 'intent://#Intent;scheme=caixa;package=br.com.gabba.Caixa;end',
+            'santander': 'intent://#Intent;scheme=santander;package=br.com.santander.way;end'
+        };
+        if(banco.startsWith('http')) {
+            window.location.href = banco;
+        } else {
+            window.location.href = links[banco];
+        }
+    }
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IAMOBI - TERMINAL DE ALTA AUTORIDADE</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
