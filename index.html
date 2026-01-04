@@ -42,18 +42,28 @@
             box-shadow: 0 6px 0px rgba(0,0,0,0.5);
         }
         .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.5); }
+        
+        /* Cores Originais UTB e BRB */
         .btn-utb { background: linear-gradient(to bottom, #f97316, #c2410c); }
         .btn-brb { background: linear-gradient(to bottom, #3b82f6, #1d4ed8); }
 
-        /* Grid de Bancos */
+        /* Grid de Bancos com Cores Identitárias */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        
         .infinite { 
             background: linear-gradient(to bottom, #1ed760, #15803d); color: #000; 
             grid-column: span 2; box-shadow: 0 5px 0px #065f46;
         }
-        .bank { background: #111827; border: 1px solid #1e293b; box-shadow: 0 5px 0px #000; }
+        
+        /* Estilização Individual dos Bancos */
+        .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
+        .btn-nubank { background: #820ad1; box-shadow: 0 5px 0px #4c067a; }
+        .btn-itau { background: #ec7000; box-shadow: 0 5px 0px #a04d00; }
+        .btn-bradesco { background: #cc092f; box-shadow: 0 5px 0px #8a0620; }
+        .btn-caixa { background: #005ca9; box-shadow: 0 5px 0px #003e73; }
+        .btn-santander { background: #ec0000; box-shadow: 0 5px 0px #a30000; }
 
-        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; }
+        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; letter-spacing: 2px; text-align: center; }
     </style>
 </head>
 <body>
@@ -76,15 +86,15 @@
 
     <div class="grid">
         <button class="btn infinite" onclick="openBank('https://link.infinitepay.io/recarga')">PAGAR VIA INFINITEPAY</button>
-        <button class="btn bank" onclick="openBank('inter')">INTER</button>
-        <button class="btn bank" onclick="openBank('nubank')">NUBANK</button>
-        <button class="btn bank" onclick="openBank('itau')">ITAÚ</button>
-        <button class="btn bank" onclick="openBank('bradesco')">BRADESCO</button>
-        <button class="btn bank" onclick="openBank('caixa')">CAIXA</button>
-        <button class="btn bank" onclick="openBank('santander')">SANTANDER</button>
+        <button class="btn btn-inter" onclick="openBank('inter')">INTER</button>
+        <button class="btn btn-nubank" onclick="openBank('nubank')">NUBANK</button>
+        <button class="btn btn-itau" onclick="openBank('itau')">ITAÚ</button>
+        <button class="btn btn-bradesco" onclick="openBank('bradesco')">BRADESCO</button>
+        <button class="btn btn-caixa" onclick="openBank('caixa')">CAIXA</button>
+        <button class="btn btn-santander" onclick="openBank('santander')">SANTANDER</button>
     </div>
 
-    <footer>SISTEMA CRIPTOGRAFADO</footer>
+    <footer>SISTEMA CRIPTOGRAFADO | PROTOCOLO ATIVO</footer>
 </div>
 
 <script>
