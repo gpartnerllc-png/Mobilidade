@@ -3,29 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA V8.0</title>
+    <title>IAMOBI - SISTEMA V14.1</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
-        body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        body { 
+            background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; 
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; 
+        }
+
         .container { width: 100%; max-width: 420px; }
-        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); box-shadow: 0 0 20px rgba(30, 215, 96, 0.1); }
+
+        .header { 
+            text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; 
+            margin-bottom: 25px; background: rgba(30, 215, 96, 0.02);
+            box-shadow: 0 0 20px rgba(30, 215, 96, 0.1);
+        }
         .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; text-shadow: 0 0 10px #1ed760; }
-        .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+
+        .card { 
+            background: linear-gradient(145deg, #0f172a 0%, #020617 100%); 
+            border-radius: 24px; padding: 25px; margin-bottom: 15px; 
+            border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;
+        }
         .utb { border-left: 4px solid #f97316; }
+
         h2 { margin: 0 0 15px 0; font-size: 1rem; color: #fff; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
-        .input-cpf { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; }
-        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; transition: 0.2s; box-shadow: 0 6px 0px rgba(0,0,0,0.5); }
+
+        .input-cpf { 
+            width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; 
+            border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; 
+            text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; 
+        }
+
+        .btn { 
+            padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; 
+            color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; 
+            font-family: 'Orbitron', sans-serif; margin-top: 10px; transition: 0.2s;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.5);
+        }
         .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.5); }
         .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
-        .btn-bank { background: #820ad1; } /* Nubank/Inter Style */
+
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center;}
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">ALTA AUTORIDADE - V8.0</small>
+        <small style="color:#1ed760">ALTA AUTORIDADE - V14.1</small>
     </div>
 
     <div class="card utb">
@@ -39,15 +67,19 @@
 
 <script>
     async function solicitarPix() {
-        const cpf = document.getElementById('cpf-user').value;
+        const cpfInput = document.getElementById('cpf-user');
         const btn = document.getElementById('btn-main');
+        const cpf = cpfInput.value;
+
         if(!cpf) return alert("DIGITE O CPF");
 
         const originalText = btn.innerText;
-        btn.innerText = "🤖 PROCESSANDO...";
+        btn.innerText = "🤖 PROCESSANDO RECARGA...";
+        btn.disabled = true;
         btn.style.opacity = "0.6";
 
         try {
+            // Rota vinculada ao seu servidor Python no IP do PC
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -57,20 +89,44 @@
             const data = await response.json();
 
             if (data.status === "sucesso") {
-                btn.innerText = "✅ PIX COPIADO!";
+                // --- PONTE DE AUTORIDADE: COPIA AUTOMÁTICA ---
+                const pixCode = data.pix;
+                
+                // Força a cópia para a área de transferência do celular
+                const textArea = document.createElement("textarea");
+                textArea.value = pixCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.setSelectionRange(0, 99999);
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+
+                // Feedback Visual de Sucesso
+                btn.innerText = "✅ PIX COPIADO COM SUCESSO!";
                 btn.style.background = "linear-gradient(to bottom, #1ed760, #15803d)";
-                alert("SUCESSO!\nO código Pix foi copiado para sua área de transferência.\nAbra seu banco para pagar.");
+                btn.style.opacity = "1";
+                
+                alert("SUCESSO ABSOLUTO!\n\n1. O Pix foi copiado.\n2. Vamos tentar abrir seu banco agora.\n3. Use 'Pix Copia e Cola' no app.");
+                
+                // Abre o Banco Inter automaticamente
+                setTimeout(() => {
+                    window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
+                }, 1500);
+
             } else {
                 alert("ERRO NO SERVIDOR: " + data.mensagem);
                 btn.innerText = originalText;
+                btn.disabled = false;
+                btn.style.opacity = "1";
             }
         } catch (err) {
-            alert("ERRO DE CONEXÃO: Verifique se o servidor Python está ligado.");
+            alert("ERRO DE CONEXÃO:\n1. O servidor Python está ligado no PC?\n2. O celular está no mesmo Wi-Fi?");
             btn.innerText = originalText;
-        } finally {
+            btn.disabled = false;
             btn.style.opacity = "1";
         }
     }
 </script>
+
 </body>
 </html>
