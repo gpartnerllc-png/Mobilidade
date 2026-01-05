@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA V14.1</title>
+    <title>IAMOBI - SISTEMA V14.3</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         
@@ -53,7 +53,7 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">ALTA AUTORIDADE - V14.1</small>
+        <small style="color:#1ed760">ALTA AUTORIDADE - V14.3</small>
     </div>
 
     <div class="card utb">
@@ -66,6 +66,8 @@
 </div>
 
 <script>
+    let pixGerado = ""; // Memória temporária do código
+
     async function solicitarPix() {
         const cpfInput = document.getElementById('cpf-user');
         const btn = document.getElementById('btn-main');
@@ -73,13 +75,11 @@
 
         if(!cpf) return alert("DIGITE O CPF");
 
-        const originalText = btn.innerText;
-        btn.innerText = "🤖 PROCESSANDO RECARGA...";
+        btn.innerText = "🤖 ROBÔ TRABALHANDO...";
         btn.disabled = true;
         btn.style.opacity = "0.6";
 
         try {
-            // Rota vinculada ao seu servidor Python no IP do PC
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -89,42 +89,65 @@
             const data = await response.json();
 
             if (data.status === "sucesso") {
-                // --- PONTE DE AUTORIDADE: COPIA AUTOMÁTICA ---
-                const pixCode = data.pix;
-                
-                // Força a cópia para a área de transferência do celular
-                const textArea = document.createElement("textarea");
-                textArea.value = pixCode;
-                document.body.appendChild(textArea);
-                textArea.select();
-                textArea.setSelectionRange(0, 99999);
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
+                pixGerado = data.pix; // Salva o pix na memória do script
 
-                // Feedback Visual de Sucesso
-                btn.innerText = "✅ PIX COPIADO COM SUCESSO!";
-                btn.style.background = "linear-gradient(to bottom, #1ed760, #15803d)";
-                btn.style.opacity = "1";
-                
-                alert("SUCESSO ABSOLUTO!\n\n1. O Pix foi copiado.\n2. Vamos tentar abrir seu banco agora.\n3. Use 'Pix Copia e Cola' no app.");
-                
-                // Abre o Banco Inter automaticamente
-                setTimeout(() => {
-                    window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
-                }, 1500);
-
-            } else {
-                alert("ERRO NO SERVIDOR: " + data.mensagem);
-                btn.innerText = originalText;
+                // TRANSFORMA O BOTÃO PARA O CLIQUE DE CÓPIA (Liberação do Android)
                 btn.disabled = false;
                 btn.style.opacity = "1";
+                btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
+                btn.innerText = "👉 COPIAR E ABRIR BANCO";
+                
+                // Muda a função do clique para disparar a cópia real
+                btn.onclick = () => finalizarEAbriBanco();
+                
+                alert("✅ ROBÔ CONCLUIU!\n\nClique no botão laranja agora para que o celular aceite copiar o código.");
+            } else {
+                alert("ERRO: " + data.mensagem);
+                resetarBotao();
             }
         } catch (err) {
-            alert("ERRO DE CONEXÃO:\n1. O servidor Python está ligado no PC?\n2. O celular está no mesmo Wi-Fi?");
-            btn.innerText = originalText;
-            btn.disabled = false;
-            btn.style.opacity = "1";
+            alert("SERVIDOR DESCONECTADO: Verifique se o Python está rodando no PC.");
+            resetarBotao();
         }
+    }
+
+    function finalizarEAbriBanco() {
+        const btn = document.getElementById('btn-main');
+        
+        // Força a criação de um elemento de texto para o Android aceitar a cópia
+        const textArea = document.createElement("textarea");
+        textArea.value = pixGerado;
+        textArea.style.position = "fixed"; // Esconde o campo
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.select();
+        textArea.setSelectionRange(0, 99999);
+
+        try {
+            document.execCommand('copy'); // O comando de cópia agora funciona por ser um clique direto
+            
+            btn.innerText = "✅ COPIADO! INDO AO BANCO...";
+            btn.style.background = "#1ed760";
+
+            // Tenta abrir o Banco Inter após a cópia
+            setTimeout(() => {
+                window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
+            }, 800);
+            
+        } catch (err) {
+            alert("Erro ao copiar para a memória.");
+        }
+
+        document.body.removeChild(textArea);
+    }
+
+    function resetarBotao() {
+        const btn = document.getElementById('btn-main');
+        btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
+        btn.onclick = solicitarPix;
     }
 </script>
 
