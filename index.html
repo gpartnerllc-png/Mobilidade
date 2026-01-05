@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA INTEGRADO V6.5</title>
+    <title>IAMOBI - SISTEMA INTEGRADO V6.6</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
@@ -38,7 +38,7 @@
         <button class="btn" style="background: #820ad1;" onclick="openBank('nubank')">NUBANK</button>
     </div>
 
-    <footer>SISTEMA CRIPTOGRAFADO | V6.5</footer>
+    <footer>SISTEMA CRIPTOGRAFADO | V6.6</footer>
 </div>
 
 <script>
@@ -61,15 +61,14 @@
             const data = await response.json();
 
             if (data.status === "sucesso") {
-                // CORREÇÃO: Removida a limpeza de hífens e espaços. 
-                // Agora pegamos o valor PURO vindo do servidor.
+                // AUTORIDADE MÁXIMA: Recebe o dado fiel (com hífens e espaços) e mantém intacto
                 pixMemoria = data.pix; 
                 
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
-                btn.innerText = "👉 COPIAR PIX INTEGRAL";
+                btn.innerText = "👉 COPIAR PIX FIEL";
                 btn.onclick = () => copiarEInter();
-                alert("✅ PIX CAPTURADO COM HIFENS E ESPAÇOS!");
+                alert("✅ PIX CAPTURADO INTEGRALMENTE!");
             } else {
                 alert("Erro: " + data.mensagem);
                 resetBtn();
@@ -82,119 +81,7 @@
 
     function copiarEInter() {
         const textArea = document.createElement("textarea");
-        // Copia o valor sem NENHUMA alteração
-        textArea.value = pixMemoria;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        
-        const btn = document.getElementById('btn-main');
-        btn.innerText = "✅ COPIADO! ABRINDO...";
-        btn.style.background = "#1ed760";
-        setTimeout(() => openBank('inter'), 800);
-    }
-
-    function openBank(banco) {
-        const links = {
-            'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
-            'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end'
-        };
-        window.location.href = links[banco];
-    }
-
-    function resetBtn() {
-        const btn = document.getElementById('btn-main');
-        btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
-        btn.disabled = false;
-        btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
-        btn.onclick = solicitarPix;
-    }
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA INTEGRADO V6.5</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
-        body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 420px; }
-        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); box-shadow: 0 0 20px rgba(30, 215, 96, 0.1); }
-        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; }
-        .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .utb { border-left: 4px solid #f97316; }
-        .input-cpf { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; }
-        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); }
-        .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
-        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center;}
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
-        <h1>IAMOBI</h1>
-        <small style="color:#1ed760">SISTEMA DE ALTA AUTORIDADE</small>
-    </div>
-
-    <div class="card utb">
-        <input type="text" id="cpf-user" class="input-cpf" placeholder="DIGITE O CPF" value="34259998854">
-        <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX AUTOMÁTICO</button>
-    </div>
-
-    <div class="grid">
-        <button class="btn btn-inter" onclick="openBank('inter')">INTER</button>
-        <button class="btn" style="background: #820ad1;" onclick="openBank('nubank')">NUBANK</button>
-    </div>
-
-    <footer>SISTEMA CRIPTOGRAFADO | V6.5</footer>
-</div>
-
-<script>
-    let pixMemoria = "";
-
-    async function solicitarPix() {
-        const cpf = document.getElementById('cpf-user').value;
-        const btn = document.getElementById('btn-main');
-        if(!cpf) return alert("CPF OBRIGATÓRIO");
-
-        btn.innerText = "🤖 PROCESSANDO...";
-        btn.disabled = true;
-
-        try {
-            const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ cpf: cpf })
-            });
-            const data = await response.json();
-
-            if (data.status === "sucesso") {
-                // VINCULADO: Limpeza que remove apenas hífens e espaços, mantendo a estrutura Pix
-                pixMemoria = data.pix.replace(/\s+/g, '').replace(/-/g, '').trim();
-                
-                btn.disabled = false;
-                btn.style.background = "#ff5000";
-                btn.innerText = "👉 COPIAR PIX LIMPADO";
-                btn.onclick = () => copiarEInter();
-                alert("✅ PIX CAPTURADO SEM ERROS!");
-            } else {
-                alert("Erro: " + data.mensagem);
-                resetBtn();
-            }
-        } catch (err) {
-            alert("SERVIDOR OFF");
-            resetBtn();
-        }
-    }
-
-    function copiarEInter() {
-        const textArea = document.createElement("textarea");
+        // Copia o valor sem nenhuma alteração de hífens ou espaços
         textArea.value = pixMemoria;
         document.body.appendChild(textArea);
         textArea.select();
