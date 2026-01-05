@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - V15.2 FINAL</title>
+    <title>IAMOBI - SISTEMA INTEGRADO V6.5</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 420px; }
-        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.05); }
-        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #1ed760; margin: 0; }
-        .card { background: #0f172a; border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        .input-cpf { width: 100%; padding: 15px; background: #000; border: 1px solid #334155; border-radius: 10px; color: #1ed760; text-align: center; font-size: 1.2rem; margin-bottom: 15px; box-sizing: border-box; }
-        .btn { padding: 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; font-family: 'Orbitron', sans-serif; transition: 0.3s; }
-        .btn-blue { background: #0066ff; }
-        .btn-orange { background: #ff5000; }
-        .btn-green { background: #1ed760; }
+        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); box-shadow: 0 0 20px rgba(30, 215, 96, 0.1); }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; }
+        .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .utb { border-left: 4px solid #f97316; }
+        .input-cpf { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; }
+        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); }
+        .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
+        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center;}
     </style>
 </head>
 <body>
@@ -23,70 +25,88 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small>PROTOCOLO DE ALTA AUTORIDADE</small>
+        <small style="color:#1ed760">SISTEMA DE ALTA AUTORIDADE</small>
     </div>
 
-    <div class="card">
-        <input type="text" id="cpf-user" class="input-cpf" placeholder="DIGITE O CPF">
-        <button id="btn-main" class="btn btn-blue" onclick="processarEnvio()">🤖 GERAR PIX AUTOMÁTICO</button>
+    <div class="card utb">
+        <input type="text" id="cpf-user" class="input-cpf" placeholder="DIGITE O CPF" value="34259998854">
+        <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX AUTOMÁTICO</button>
     </div>
+
+    <div class="grid">
+        <button class="btn btn-inter" onclick="openBank('inter')">INTER</button>
+        <button class="btn" style="background: #820ad1;" onclick="openBank('nubank')">NUBANK</button>
+    </div>
+
+    <footer>SISTEMA CRIPTOGRAFADO | V6.5</footer>
 </div>
 
 <script>
-    let cachePix = "";
+    let pixMemoria = "";
 
-    async function processarEnvio() {
+    async function solicitarPix() {
         const cpf = document.getElementById('cpf-user').value;
         const btn = document.getElementById('btn-main');
+        if(!cpf) return alert("CPF OBRIGATÓRIO");
 
-        if(!cpf) return alert("CPF VAZIO");
-
-        btn.innerText = "⚡ SINCRONIZANDO ROBÔ...";
+        btn.innerText = "🤖 PROCESSANDO...";
         btn.disabled = true;
 
         try {
-            const res = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
+            const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ cpf: cpf })
             });
-
-            const data = await res.json();
+            const data = await response.json();
 
             if (data.status === "sucesso") {
-                // Limpeza redundante para segurança total
-                cachePix = data.pix.replace(/[^a-zA-Z0-9]/g, ""); 
+                // PURIFICAÇÃO RADICAL: Remove tudo que não é letra/número
+                pixMemoria = data.pix.replace(/[^a-zA-Z0-9]/g, "");
                 
-                btn.className = "btn btn-orange";
-                btn.innerText = "👉 COPIAR E ABRIR BANCO";
                 btn.disabled = false;
-                btn.onclick = () => finalizar();
+                btn.style.background = "#ff5000";
+                btn.innerText = "👉 COPIAR PIX LIMPADO";
+                btn.onclick = () => copiarEInter();
+                alert("✅ PIX CAPTURADO SEM ERROS!");
             } else {
-                alert("ERRO: O site demorou a responder. Tente novamente.");
-                location.reload();
+                alert("Erro: " + data.mensagem);
+                resetBtn();
             }
-        } catch (e) {
-            alert("SERVIDOR DESCONECTADO");
-            location.reload();
+        } catch (err) {
+            alert("SERVIDOR OFF");
+            resetBtn();
         }
     }
 
-    function finalizar() {
-        const btn = document.getElementById('btn-main');
-        const area = document.createElement("textarea");
-        area.value = cachePix;
-        document.body.appendChild(area);
-        area.select();
-        
+    function copiarEInter() {
+        const textArea = document.createElement("textarea");
+        textArea.value = pixMemoria;
+        document.body.appendChild(textArea);
+        textArea.select();
         document.execCommand('copy');
-        document.body.removeChild(area);
+        document.body.removeChild(textArea);
+        
+        const btn = document.getElementById('btn-main');
+        btn.innerText = "✅ COPIADO! ABRINDO...";
+        btn.style.background = "#1ed760";
+        setTimeout(() => openBank('inter'), 800);
+    }
 
-        btn.className = "btn btn-green";
-        btn.innerText = "✅ SUCESSO! ABRINDO...";
+    function openBank(banco) {
+        const links = {
+            'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
+            'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end'
+        };
+        window.location.href = links[banco];
+    }
 
-        setTimeout(() => {
-            window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
-        }, 500);
+    function resetBtn() {
+        const btn = document.getElementById('btn-main');
+        btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
+        btn.disabled = false;
+        btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
+        btn.onclick = solicitarPix;
     }
 </script>
 </body>
