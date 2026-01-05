@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA V14.9</title>
+    <title>IAMOBI - SISTEMA V15.0</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 420px; }
-        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); }
-        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; text-shadow: 0 0 10px #1ed760; }
+        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); box-shadow: 0 0 20px rgba(30, 215, 96, 0.1); }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; }
         .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .utb { border-left: 4px solid #f97316; }
         .input-cpf { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; }
-        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); transition: 0.3s; }
+        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); }
         .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
-        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; }
+        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center;}
     </style>
 </head>
 <body>
@@ -23,7 +23,7 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">EXTRAÇÃO DE TEXTO BRUTO V14.9</small>
+        <small style="color:#1ed760">ALTA FIDELIDADE V15.0</small>
     </div>
 
     <div class="card utb">
@@ -31,11 +31,11 @@
         <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX AUTOMÁTICO</button>
     </div>
 
-    <footer>ESTABILIZAÇÃO DE CAPTURA ATIVA</footer>
+    <footer>ESTABILIZAÇÃO DE DADOS ATIVA</footer>
 </div>
 
 <script>
-    let pixTratado = ""; 
+    let pixFinal = "";
 
     async function solicitarPix() {
         const cpf = document.getElementById('cpf-user').value;
@@ -43,9 +43,8 @@
 
         if(!cpf) return alert("DIGITE O CPF");
 
-        btn.innerText = "🤖 CAPTURANDO TEXTO (10S)...";
+        btn.innerText = "🤖 CAPTURANDO CÓDIGO INTEIRO...";
         btn.disabled = true;
-        btn.style.opacity = "0.7";
 
         try {
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
@@ -56,64 +55,62 @@
 
             const data = await response.json();
 
-            if (data.status === "sucesso") {
-                // FILTRO DE PURIFICAÇÃO TOTAL:
-                // Remove hífens que quebram o link, espaços e quebras de linha
-                // O código Pix deve ser uma linha única de texto contínuo.
-                pixTratado = data.pix.replace(/[\n\r]/g, "").replace(/\s/g, "").trim();
+            // SÓ PROSSEGUE SE O PIX FOR VÁLIDO (Mínimo 200 caracteres para ser PIX de verdade)
+            if (data.status === "sucesso" && data.pix.length > 200) {
                 
-                // Aguarda 10 segundos para garantir que o texto no PC estabilizou
-                let segundos = 10;
+                // LIMPEZA TOTAL: Remove quebras de linha, espaços e hífens extras
+                pixFinal = data.pix.replace(/[\n\r]/g, "").replace(/\s+/g, "").trim();
+                
+                // Aguarda 10 segundos de segurança para o banco aceitar a nova transação
+                let count = 10;
                 const timer = setInterval(() => {
-                    btn.innerText = `🤖 ESTABILIZANDO... ${segundos}S`;
-                    segundos--;
-                    if(segundos < 0) {
+                    btn.innerText = `🤖 VALIDANDO... ${count}S`;
+                    count--;
+                    if(count < 0) {
                         clearInterval(timer);
                         btn.disabled = false;
-                        btn.style.opacity = "1";
                         btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
-                        btn.innerText = "👉 COPIAR CÓDIGO BR CODE";
-                        btn.onclick = () => finalizarEAbriBanco();
-                        alert("✅ TEXTO BRUTO CAPTURADO!\n\nO código foi limpo e está pronto para o Banco Inter.");
+                        btn.innerText = "👉 COPIAR PIX 100% COMPLETO";
+                        btn.onclick = () => finalizarCopia();
                     }
                 }, 1000);
+
             } else {
-                alert("ERRO: " + data.mensagem);
+                alert("ERRO DE CAPTURA: O código veio cortado. O robô vai reiniciar a tentativa.");
                 resetBtn();
             }
         } catch (err) {
-            alert("SERVIDOR OFF: Ligue o Python no PC.");
+            alert("ERRO: O servidor no PC parou.");
             resetBtn();
         }
     }
 
-    function finalizarEAbriBanco() {
+    function finalizarCopia() {
         const btn = document.getElementById('btn-main');
-        const area = document.createElement("textarea");
-        area.value = pixTratado;
-        document.body.appendChild(area);
-        area.select();
+        const textArea = document.createElement("textarea");
+        textArea.value = pixFinal;
+        document.body.appendChild(textArea);
+        textArea.select();
         
         try {
             document.execCommand('copy');
-            btn.innerText = "✅ COPIADO! ABRINDO INTER...";
+            btn.innerText = "✅ COPIADO! INDO AO BANCO...";
             btn.style.background = "#1ed760";
 
             setTimeout(() => {
                 window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
-                setTimeout(() => resetBtn(), 5000);
-            }, 800);
+                setTimeout(() => resetBtn(), 6000);
+            }, 1000);
         } catch (e) {
-            alert("Falha ao copiar código.");
+            alert("Falha ao copiar.");
         }
-        document.body.removeChild(area);
+        document.body.removeChild(textArea);
     }
 
     function resetBtn() {
         const btn = document.getElementById('btn-main');
         btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
         btn.disabled = false;
-        btn.style.opacity = "1";
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
         btn.onclick = solicitarPix;
     }
