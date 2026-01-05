@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA V14.8</title>
+    <title>IAMOBI - ACESSO DIRETO V14.9</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 420px; }
-        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); box-shadow: 0 0 20px rgba(30, 215, 96, 0.1); }
-        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; }
+        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; text-shadow: 0 0 10px #1ed760; }
         .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .utb { border-left: 4px solid #f97316; }
         .input-cpf { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; }
         .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; transition: 0.2s; box-shadow: 0 6px 0px rgba(0,0,0,0.5); }
-        .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.5); }
         .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center;}
     </style>
@@ -24,7 +23,7 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">ALTA AUTORIDADE - V14.8</small>
+        <small style="color:#1ed760">ALTA AUTORIDADE - BYPASS ATIVO</small>
     </div>
 
     <div class="card utb">
@@ -32,11 +31,11 @@
         <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX AUTOMÁTICO</button>
     </div>
 
-    <footer>PROTOCOLO DE SEGURANÇA NIVEL 7</footer>
+    <footer>PROTOCOLO DE INJEÇÃO DIRETA</footer>
 </div>
 
 <script>
-    let pixFinalizado = ""; 
+    let pixPronto = ""; 
 
     async function solicitarPix() {
         const cpf = document.getElementById('cpf-user').value;
@@ -44,7 +43,7 @@
 
         if(!cpf) return alert("DIGITE O CPF");
 
-        btn.innerText = "🤖 LIMPANDO CÓDIGO...";
+        btn.innerText = "🤖 PROCESSANDO...";
         btn.disabled = true;
 
         try {
@@ -57,20 +56,16 @@
             const data = await response.json();
 
             if (data.status === "sucesso") {
-                // PURIFICAÇÃO RADICAL:
-                // 1. Remove quebras de linha
-                // 2. Remove hífens e espaços (que aparecem no seu log e matam o Inter)
-                // 3. Mantém apenas caracteres válidos do protocolo Pix
-                let sujo = data.pix;
-                pixFinalizado = sujo.replace(/\s+/g, '').replace(/-/g, '').trim();
+                // LIMPEZA ABSOLUTA: Remove espaços, hífens, tabs e quebras de linha
+                // O código precisa ser uma "pedra única" de texto
+                pixPronto = data.pix.replace(/[\n\r\s-]/g, "").trim();
 
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
-                    btn.innerText = "👉 COPIAR CODIGO SEM ERRO";
-                    btn.onclick = () => executarCopia();
-                    alert("✅ SUCESSO!\nCódigo purificado e pronto para o Banco Inter.");
-                }, 1000);
+                btn.disabled = false;
+                btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
+                btn.innerText = "👉 INJETAR E ABRIR BANCO";
+                btn.onclick = () => abrirBancoDireto();
+                
+                alert("✅ PIX CAPTURADO!\nClique para injetar na memória e saltar para o Banco.");
             } else {
                 alert("ERRO: " + data.mensagem);
                 resetBtn();
@@ -81,30 +76,34 @@
         }
     }
 
-    function executarCopia() {
+    function abrirBancoDireto() {
         const btn = document.getElementById('btn-main');
         
-        // Criação do elemento de cópia com foco forçado
-        const area = document.createElement("textarea");
-        area.value = pixFinalizado;
-        document.body.appendChild(area);
-        area.select();
-        area.setSelectionRange(0, 99999);
-
+        // Injeção na área de transferência
+        const temp = document.createElement("textarea");
+        temp.value = pixPronto;
+        document.body.appendChild(temp);
+        temp.select();
+        
         try {
             document.execCommand('copy');
-            btn.innerText = "✅ COPIADO! ABRINDO INTER...";
+            btn.innerText = "✅ COPIADO! SALTANDO...";
             btn.style.background = "#1ed760";
 
+            // BYPASS GOOGLE PLAY: Tenta abrir o scheme direto do app
+            // O Banco Inter usa o scheme 'inter://'
+            window.location.href = "inter://";
+
+            // Caso o scheme puro falhe em alguns navegadores, tentamos o fallback rápido
             setTimeout(() => {
-                // Abre o Banco Inter direto
                 window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
-                setTimeout(() => resetBtn(), 5000);
-            }, 800);
+            }, 500);
+
+            setTimeout(() => resetBtn(), 5000);
         } catch (e) {
-            alert("Erro ao copiar.");
+            alert("Falha no Bypass.");
         }
-        document.body.removeChild(area);
+        document.body.removeChild(temp);
     }
 
     function resetBtn() {
