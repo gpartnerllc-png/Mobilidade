@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA V15.0</title>
+    <title>IAMOBI - V15.2 FINAL</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@500;700&display=swap');
         body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 420px; }
-        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); box-shadow: 0 0 20px rgba(30, 215, 96, 0.1); }
-        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; }
-        .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
-        .utb { border-left: 4px solid #f97316; }
-        .input-cpf { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; }
-        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); }
-        .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
-        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center;}
+        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.05); }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: #1ed760; margin: 0; }
+        .card { background: #0f172a; border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
+        .input-cpf { width: 100%; padding: 15px; background: #000; border: 1px solid #334155; border-radius: 10px; color: #1ed760; text-align: center; font-size: 1.2rem; margin-bottom: 15px; box-sizing: border-box; }
+        .btn { padding: 18px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: #fff; width: 100%; font-family: 'Orbitron', sans-serif; transition: 0.3s; }
+        .btn-blue { background: #0066ff; }
+        .btn-orange { background: #ff5000; }
+        .btn-green { background: #1ed760; }
     </style>
 </head>
 <body>
@@ -23,96 +23,70 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">ALTA FIDELIDADE V15.0</small>
+        <small>PROTOCOLO DE ALTA AUTORIDADE</small>
     </div>
 
-    <div class="card utb">
-        <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00">
-        <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX AUTOMÁTICO</button>
+    <div class="card">
+        <input type="text" id="cpf-user" class="input-cpf" placeholder="DIGITE O CPF">
+        <button id="btn-main" class="btn btn-blue" onclick="processarEnvio()">🤖 GERAR PIX AUTOMÁTICO</button>
     </div>
-
-    <footer>ESTABILIZAÇÃO DE DADOS ATIVA</footer>
 </div>
 
 <script>
-    let pixFinal = "";
+    let cachePix = "";
 
-    async function solicitarPix() {
+    async function processarEnvio() {
         const cpf = document.getElementById('cpf-user').value;
         const btn = document.getElementById('btn-main');
 
-        if(!cpf) return alert("DIGITE O CPF");
+        if(!cpf) return alert("CPF VAZIO");
 
-        btn.innerText = "🤖 CAPTURANDO CÓDIGO INTEIRO...";
+        btn.innerText = "⚡ SINCRONIZANDO ROBÔ...";
         btn.disabled = true;
 
         try {
-            const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
+            const res = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ cpf: cpf })
             });
 
-            const data = await response.json();
+            const data = await res.json();
 
-            // SÓ PROSSEGUE SE O PIX FOR VÁLIDO (Mínimo 200 caracteres para ser PIX de verdade)
-            if (data.status === "sucesso" && data.pix.length > 200) {
+            if (data.status === "sucesso") {
+                // Limpeza redundante para segurança total
+                cachePix = data.pix.replace(/[^a-zA-Z0-9]/g, ""); 
                 
-                // LIMPEZA TOTAL: Remove quebras de linha, espaços e hífens extras
-                pixFinal = data.pix.replace(/[\n\r]/g, "").replace(/\s+/g, "").trim();
-                
-                // Aguarda 10 segundos de segurança para o banco aceitar a nova transação
-                let count = 10;
-                const timer = setInterval(() => {
-                    btn.innerText = `🤖 VALIDANDO... ${count}S`;
-                    count--;
-                    if(count < 0) {
-                        clearInterval(timer);
-                        btn.disabled = false;
-                        btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
-                        btn.innerText = "👉 COPIAR PIX 100% COMPLETO";
-                        btn.onclick = () => finalizarCopia();
-                    }
-                }, 1000);
-
+                btn.className = "btn btn-orange";
+                btn.innerText = "👉 COPIAR E ABRIR BANCO";
+                btn.disabled = false;
+                btn.onclick = () => finalizar();
             } else {
-                alert("ERRO DE CAPTURA: O código veio cortado. O robô vai reiniciar a tentativa.");
-                resetBtn();
+                alert("ERRO: O site demorou a responder. Tente novamente.");
+                location.reload();
             }
-        } catch (err) {
-            alert("ERRO: O servidor no PC parou.");
-            resetBtn();
-        }
-    }
-
-    function finalizarCopia() {
-        const btn = document.getElementById('btn-main');
-        const textArea = document.createElement("textarea");
-        textArea.value = pixFinal;
-        document.body.appendChild(textArea);
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            btn.innerText = "✅ COPIADO! INDO AO BANCO...";
-            btn.style.background = "#1ed760";
-
-            setTimeout(() => {
-                window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
-                setTimeout(() => resetBtn(), 6000);
-            }, 1000);
         } catch (e) {
-            alert("Falha ao copiar.");
+            alert("SERVIDOR DESCONECTADO");
+            location.reload();
         }
-        document.body.removeChild(textArea);
     }
 
-    function resetBtn() {
+    function finalizar() {
         const btn = document.getElementById('btn-main');
-        btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
-        btn.disabled = false;
-        btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
-        btn.onclick = solicitarPix;
+        const area = document.createElement("textarea");
+        area.value = cachePix;
+        document.body.appendChild(area);
+        area.select();
+        
+        document.execCommand('copy');
+        document.body.removeChild(area);
+
+        btn.className = "btn btn-green";
+        btn.innerText = "✅ SUCESSO! ABRINDO...";
+
+        setTimeout(() => {
+            window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
+        }, 500);
     }
 </script>
 </body>
