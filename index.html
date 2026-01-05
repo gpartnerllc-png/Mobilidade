@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA V14.4</title>
+    <title>IAMOBI - SISTEMA V14.5</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         
@@ -53,7 +53,7 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">ALTA AUTORIDADE - V14.4</small>
+        <small style="color:#1ed760">ALTA AUTORIDADE - V14.5</small>
     </div>
 
     <div class="card utb">
@@ -66,7 +66,7 @@
 </div>
 
 <script>
-    let pixGerado = ""; // Memória global para segurar a chave vinda do Python
+    let pixGerado = ""; 
     const originalText = "🤖 GERAR PIX AUTOMÁTICO";
 
     async function solicitarPix() {
@@ -76,12 +76,11 @@
 
         if(!cpf) return alert("DIGITE O CPF");
 
-        btn.innerText = "🤖 PROCESSANDO...";
+        btn.innerText = "🤖 CAPTURANDO PIX...";
         btn.disabled = true;
         btn.style.opacity = "0.6";
 
         try {
-            // Conexão com o servidor Python
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -91,24 +90,23 @@
             const data = await response.json();
 
             if (data.status === "sucesso") {
-                // SUCESSO: Captura a chave e muda o estado do sistema para INJEÇÃO
-                pixGerado = data.pix;
+                // TRATAMENTO DE SEGURANÇA: Remove espaços e quebras de linha para evitar erro no Banco
+                pixGerado = data.pix.replace(/\s/g, '').trim();
                 
                 btn.disabled = false;
                 btn.style.opacity = "1";
                 btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
-                btn.innerText = "👉 CLIQUE PARA COPIAR PIX";
+                btn.innerText = "👉 COPIAR PIX INTEGRAL";
                 
-                // Vincula o novo clique para FINALIZAR a operação
                 btn.onclick = () => finalizarInjecao();
                 
-                alert("✅ ROBÔ CONCLUIU!\n\nClique no botão LARANJA agora para injetar o Pix na memória e abrir o banco.");
+                alert("✅ PIX CAPTURADO COM SUCESSO!\n\nClique no botão LARANJA para injetar o código limpo na memória.");
             } else {
                 alert("ERRO: " + data.mensagem);
                 resetBtn();
             }
         } catch (err) {
-            alert("SERVIDOR OFF: Verifique o Python no seu PC.");
+            alert("ERRO DE VINCULAÇÃO: Verifique o servidor no seu PC.");
             resetBtn();
         }
     }
@@ -117,12 +115,10 @@
         const btn = document.getElementById('btn-main');
         if (!pixGerado) return;
 
-        // Técnica de injeção via TextArea invisível (Bypass de segurança mobile)
         const textArea = document.createElement("textarea");
-        textArea.value = pixGerado;
+        textArea.value = pixGerado; // Código limpo e completo
         textArea.style.position = "fixed";
         textArea.style.left = "-9999px";
-        textArea.style.top = "0";
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
@@ -131,20 +127,18 @@
         try {
             const copiado = document.execCommand('copy');
             if (copiado) {
-                btn.innerText = "✅ COPIADO! ABRINDO BANCO...";
+                btn.innerText = "✅ PIX NA MEMÓRIA!";
                 btn.style.background = "#1ed760";
 
-                // Direcionamento para o Banco Inter
                 setTimeout(() => {
+                    // Deep Link para o Banco Inter
                     window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
-                    // Retorna ao estado inicial após 5 segundos
-                    setTimeout(() => resetBtn(), 5000);
+                    setTimeout(() => resetBtn(), 4000);
                 }, 800);
             }
         } catch (err) {
-            alert("Falha na injeção de memória.");
+            alert("Erro crítico na cópia.");
         }
-
         document.body.removeChild(textArea);
     }
 
