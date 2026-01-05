@@ -3,48 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IAMOBI - SISTEMA V14.5</title>
+    <title>IAMOBI - SISTEMA V14.6</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         
-        body { 
-            background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; 
-            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; 
-        }
-
+        body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 420px; }
-
-        .header { 
-            text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; 
-            margin-bottom: 25px; background: rgba(30, 215, 96, 0.02);
-            box-shadow: 0 0 20px rgba(30, 215, 96, 0.1);
-        }
+        .header { text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; background: rgba(30, 215, 96, 0.02); box-shadow: 0 0 20px rgba(30, 215, 96, 0.1); }
         .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; text-shadow: 0 0 10px #1ed760; }
-
-        .card { 
-            background: linear-gradient(145deg, #0f172a 0%, #020617 100%); 
-            border-radius: 24px; padding: 25px; margin-bottom: 15px; 
-            border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden;
-        }
+        .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
         .utb { border-left: 4px solid #f97316; }
-
         h2 { margin: 0 0 15px 0; font-size: 1rem; color: #fff; font-family: 'Orbitron', sans-serif; letter-spacing: 2px; text-transform: uppercase; }
-
-        .input-cpf { 
-            width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; 
-            border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; 
-            text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; 
-        }
-
-        .btn { 
-            padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; 
-            color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; 
-            font-family: 'Orbitron', sans-serif; margin-top: 10px; transition: 0.2s;
-            box-shadow: 0 6px 0px rgba(0,0,0,0.5);
-        }
+        .input-cpf { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 12px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.2rem; box-sizing: border-box; margin-bottom: 15px; }
+        .btn { padding: 18px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.85rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; transition: 0.2s; box-shadow: 0 6px 0px rgba(0,0,0,0.5); }
         .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.5); }
         .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
-
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center;}
     </style>
 </head>
@@ -53,7 +26,7 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">ALTA AUTORIDADE - V14.5</small>
+        <small style="color:#1ed760">ALTA AUTORIDADE - V14.6</small>
     </div>
 
     <div class="card utb">
@@ -76,7 +49,7 @@
 
         if(!cpf) return alert("DIGITE O CPF");
 
-        btn.innerText = "🤖 CAPTURANDO PIX...";
+        btn.innerText = "🤖 EXTRAINDO CÓDIGO BR CODE...";
         btn.disabled = true;
         btn.style.opacity = "0.6";
 
@@ -89,24 +62,29 @@
 
             const data = await response.json();
 
-            if (data.status === "sucesso") {
-                // TRATAMENTO DE SEGURANÇA: Remove espaços e quebras de linha para evitar erro no Banco
-                pixGerado = data.pix.replace(/\s/g, '').trim();
+            // SÓ LIBERA SE O PIX TIVER O TAMANHO MÍNIMO DE UM CÓDIGO REAL (Acima de 150 caracteres)
+            if (data.status === "sucesso" && data.pix.length > 100) {
                 
-                btn.disabled = false;
-                btn.style.opacity = "1";
-                btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
-                btn.innerText = "👉 COPIAR PIX INTEGRAL";
+                // Limpeza Radical: Remove espaços, quebras de linha e caracteres invisíveis
+                pixGerado = data.pix.replace(/\s+/g, '').trim();
                 
-                btn.onclick = () => finalizarInjecao();
-                
-                alert("✅ PIX CAPTURADO COM SUCESSO!\n\nClique no botão LARANJA para injetar o código limpo na memória.");
+                // Delay de estabilização de rede
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                    btn.style.background = "linear-gradient(to bottom, #ff7a00, #ff5000)";
+                    btn.innerText = "👉 COPIAR CÓDIGO (LINK PIX)";
+                    
+                    btn.onclick = () => finalizarInjecao();
+                    alert("✅ CÓDIGO EXTRAÍDO!\n\nO link do Pix foi capturado integralmente. Clique no botão laranja.");
+                }, 1500);
+
             } else {
-                alert("ERRO: " + data.mensagem);
+                alert("ERRO DE CAPTURA: O código veio incompleto. Tente novamente.");
                 resetBtn();
             }
         } catch (err) {
-            alert("ERRO DE VINCULAÇÃO: Verifique o servidor no seu PC.");
+            alert("ERRO DE CONEXÃO: Verifique o terminal Python.");
             resetBtn();
         }
     }
@@ -116,7 +94,7 @@
         if (!pixGerado) return;
 
         const textArea = document.createElement("textarea");
-        textArea.value = pixGerado; // Código limpo e completo
+        textArea.value = pixGerado; 
         textArea.style.position = "fixed";
         textArea.style.left = "-9999px";
         document.body.appendChild(textArea);
@@ -125,19 +103,20 @@
         textArea.setSelectionRange(0, 99999);
 
         try {
+            // Comando de cópia de alta prioridade
             const copiado = document.execCommand('copy');
             if (copiado) {
-                btn.innerText = "✅ PIX NA MEMÓRIA!";
+                btn.innerText = "✅ LINK COPIADO!";
                 btn.style.background = "#1ed760";
 
                 setTimeout(() => {
-                    // Deep Link para o Banco Inter
+                    // Abre o banco Inter
                     window.location.href = "intent://#Intent;scheme=inter;package=br.com.intermedium;end";
-                    setTimeout(() => resetBtn(), 4000);
-                }, 800);
+                    setTimeout(() => resetBtn(), 5000);
+                }, 1000);
             }
         } catch (err) {
-            alert("Erro crítico na cópia.");
+            alert("Falha ao injetar dados na área de transferência.");
         }
         document.body.removeChild(textArea);
     }
