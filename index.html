@@ -47,6 +47,9 @@
 
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; letter-spacing: 1px; }
+        
+        /* Estilo para os labels */
+        .label-autoridade { font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -61,14 +64,15 @@
     </div>
 
     <div class="card utb">
-        <div style="font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold;">CONFIGURAÇÃO DE RECARGA</div>
+        <div class="label-autoridade">Configuração de Recarga</div>
         
         <div style="position: relative; margin-bottom: 12px;">
             <span style="position: absolute; left: 15px; top: 18px; color: #1ed760; font-family: 'Orbitron'; font-weight: bold;">R$</span>
-            <input type="number" id="valor-recarga" class="input-cpf" placeholder="VALOR" value="50" style="padding-left: 45px; margin-bottom: 5px;">
-            <small style="color: #334155; font-size: 10px; display: block; text-align: center;">DIGITE O VALOR QUE DESEJA COLOCAR</small>
+            <input type="number" id="valor-recarga" class="input-cpf" placeholder="VALOR" value="50" step="1" min="5" style="padding-left: 45px; margin-bottom: 5px;">
+            <small style="color: #334155; font-size: 10px; display: block; text-align: center;">VALOR LIVRE (MÍNIMO R$ 5,00)</small>
         </div>
 
+        <div class="label-autoridade">Digite seu CPF</div>
         <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00" value="34259998854">
         
         <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX DE R$ <span id="display-valor">50</span></button>
@@ -93,10 +97,10 @@
 <script>
     let pixMemoria = "";
 
-    // ATUALIZAÇÃO EM TEMPO REAL DO VALOR NO BOTÃO
+    // Sincroniza valor do botão e garante o mínimo de 5
     document.getElementById('valor-recarga').addEventListener('input', (e) => {
-        const val = e.target.value || "0";
-        document.getElementById('display-valor').innerText = val;
+        let v = e.target.value;
+        document.getElementById('display-valor').innerText = v || "0";
     });
 
     window.onload = () => {
@@ -133,22 +137,23 @@
 
     async function solicitarPix() {
         const cpf = document.getElementById('cpf-user').value;
-        const valorLivre = document.getElementById('valor-recarga').value;
+        const valorInput = document.getElementById('valor-recarga').value;
         const btn = document.getElementById('btn-main');
         
         if(!cpf) return alert("CPF OBRIGATÓRIO");
-        if(!valorLivre || valorLivre <= 0) return alert("INSIRA UM VALOR VÁLIDO");
+        if(!valorInput || parseFloat(valorInput) < 5) return alert("VALOR MÍNIMO É R$ 5,00");
         
-        btn.innerText = "🤖 PROCESSANDO R$ " + valorLivre + "...";
+        btn.innerText = "🤖 PROCESSANDO R$ " + valorInput + "...";
         btn.disabled = true;
 
         try {
+            // ENVIANDO VALOR REAL PARA O SERVIDOR
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ 
                     cpf: cpf, 
-                    valor: valorLivre  // ENVIANDO O VALOR DIGITADO
+                    valor: parseFloat(valorInput) // Converte para número antes de enviar
                 })
             });
             const data = await response.json();
@@ -161,7 +166,7 @@
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.style.boxShadow = "0 6px 0px #b33800";
-                btn.innerText = "👉 PAGAR R$ " + valorLivre + " AGORA";
+                btn.innerText = "👉 PAGAR R$ " + valorInput + " AGORA";
                 
                 btn.onclick = () => { copiarEInter('universal'); };
                 btn.click();
@@ -170,7 +175,7 @@
                 resetBtn();
             }
         } catch (err) {
-            alert("SERVIDOR OFF");
+            alert("ERRO: SERVIDOR NÃO RESPONDEU");
             resetBtn();
         }
     }
@@ -178,7 +183,6 @@
     async function copiarEInter(banco) {
         if (!pixMemoria) return;
         const pixPuro = pixMemoria.replace(/%20/g, ' ').replace(/\s+/g, ' ');
-        
         try {
             await navigator.clipboard.writeText(pixPuro);
         } catch (err) {
@@ -189,39 +193,23 @@
             document.execCommand('copy');
             document.body.removeChild(textArea);
         }
-        
         const btn = document.getElementById('btn-main');
         btn.innerText = "✅ COPIADO! SALTANDO...";
         btn.style.background = "#1ed760";
-        btn.style.boxShadow = "0 6px 0px #159e46";
-        
         openBank(banco);
     }
 
     function openBank(banco) {
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
-
         const links = {
-            'google': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;component=com.google.android.apps.walletnfcrel/com.google.commerce.tapandpay.android.wallet.WalletActivity;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel;end`,
-            'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
-            'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
-            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;S.browser_fallback_url=pix:${pixLimpo};end`
+            'google': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;end`,
+            'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;end`,
+            'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;end`,
+            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;end`
         };
-
         const target = links[banco] || `pix:${pixLimpo}`;
-        
-        const trigger = document.createElement('a');
-        trigger.href = target;
-        trigger.style.display = 'none';
-        document.body.appendChild(trigger);
-        trigger.click();
-
-        setTimeout(() => {
-            if (document.hasFocus()) {
-                window.location.replace(target);
-            }
-        }, 350);
+        window.location.replace(target);
     }
 
     function resetBtn() {
