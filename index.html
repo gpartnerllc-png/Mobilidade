@@ -74,7 +74,9 @@
         <button class="btn btn-nu" onclick="openBank('nubank')">NUBANK</button>
     </div>
     
-    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 CARTEIRA DIGITAL / OUTROS</button>
+    <button class="btn" style="background: linear-gradient(to right, #4285F4, #34A853, #FBBC05, #EA4335); margin-top: 12px;" onclick="openBank('google')">💳 GOOGLE WALLET / CARTEIRA</button>
+
+    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS / CARTEIRAS</button>
 
     <footer>SISTEMA CRIPTOGRAFADO | V6.6 | PROTECTED BY IAMOBI NUVEM</footer>
 </div>
@@ -140,11 +142,7 @@
                 btn.style.boxShadow = "0 6px 0px #b33800";
                 btn.innerText = "👉 ABRIR APP AGORA";
                 
-                btn.onclick = () => {
-                    copiarEInter('universal');
-                };
-
-                // Auto-clique de tentativa
+                btn.onclick = () => { copiarEInter('universal'); };
                 btn.click();
             } else {
                 alert("Erro: " + data.mensagem);
@@ -183,8 +181,9 @@
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
 
-        // MAPA DE INTENTS COM SCHEME UPI (Padrão 2026 para abrir seletor de bancos)
+        // MAPA DE INTENTS REFINADO (GOOGLE WALLET COM DADOS DO SEU ADB)
         const links = {
+            'google': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;component=com.google.android.apps.walletnfcrel/com.google.commerce.tapandpay.android.wallet.WalletActivity;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel;end`,
             'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
             'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
             'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;S.browser_fallback_url=pix:${pixLimpo};end`
@@ -192,30 +191,28 @@
 
         const target = links[banco] || `pix:${pixLimpo}`;
         
-        // --- TÉCNICA DE SALTO DE ALTA AUTORIDADE ---
-        // Usamos um Iframe invisível para forçar o Android a processar o protocolo sem sair da página atual
-        let iframe = document.getElementById('intent-trigger');
-        if (!iframe) {
-            iframe = document.createElement('iframe');
-            iframe.id = 'intent-trigger';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
+        // MOTOR DE SALTO TRIPLO
+        const trigger = document.createElement('a');
+        trigger.href = target;
+        trigger.style.display = 'none';
+        document.body.appendChild(trigger);
+        trigger.click();
+
+        let frame = document.getElementById('iamobi-jump');
+        if (!frame) {
+            frame = document.createElement('iframe');
+            frame.id = 'iamobi-jump';
+            frame.style.display = 'none';
+            document.body.appendChild(frame);
         }
-        
-        // 1. Tenta via Iframe (Ignora bloqueio de redirecionamento)
-        iframe.src = target;
+        frame.src = target;
 
-        // 2. Fallback via clique em link dinâmico
-        const a = document.createElement('a');
-        a.href = target;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        // 3. Fallback bruto (Apenas se o dispositivo estiver parado)
         setTimeout(() => {
-            if (document.hasFocus()) { window.location.assign(`pix:${pixLimpo}`); }
-        }, 300);
+            if (document.hasFocus()) {
+                window.location.replace(target);
+            }
+            if(trigger.parentNode) document.body.removeChild(trigger);
+        }, 350);
     }
 
     function resetBtn() {
