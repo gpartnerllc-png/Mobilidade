@@ -36,7 +36,7 @@
         
         .timer-box { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--warning-orange); margin-top: 10px; display: none; text-align: center; }
         .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 25px 0; position: relative; }
-        .divider::after { content: "OPEN BANKING"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #020408; padding: 0 10px; font-size: 10px; color: #334155; }
+        .divider::after { content: "OPEN BANKING"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #020408; padding: 0 10px; font-size: 10px; color: #334155; letter-spacing: 2px; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
         .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
@@ -45,6 +45,7 @@
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
@@ -79,8 +80,9 @@
         <button class="btn btn-nu" onclick="openBank('nubank')">NUBANK</button>
     </div>
     
-    <button class="btn" style="background: linear-gradient(to right, #4285F4, #34A853, #FBBC05, #EA4335); margin-top: 12px;" onclick="openBank('google')">💳 GOOGLE WALLET</button>
-    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS</button>
+    <button class="btn" style="background: linear-gradient(to right, #4285F4, #34A853, #FBBC05, #EA4335); margin-top: 12px;" onclick="openBank('google')">💳 GOOGLE WALLET / CARTEIRA</button>
+
+    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS / CARTEIRAS</button>
 
     <footer>SISTEMA CRIPTOGRAFADO | V6.6 | PROTECTED BY IAMOBI NUVEM</footer>
 </div>
@@ -88,14 +90,23 @@
 <script>
     let pixMemoria = "";
 
-    // Sincroniza o texto do botão com o que é digitado
+    // Sincroniza o botão com o input
     document.getElementById('valor-recarga').addEventListener('input', (e) => {
         document.getElementById('display-valor').innerText = e.target.value || "0";
     });
 
+    function viberEffect() {
+        const hv = document.getElementById('haptic-vibe');
+        hv.style.display = 'block';
+        setTimeout(() => { hv.style.display = 'none'; }, 200);
+        if (window.Telegram.WebApp?.HapticFeedback) {
+            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+    }
+
     async function solicitarPix() {
         const cpfValue = document.getElementById('cpf-user').value;
-        const valorValue = document.getElementById('valor-recarga').value; // PEGA O VALOR DO INPUT
+        const valorValue = document.getElementById('valor-recarga').value;
         const btn = document.getElementById('btn-main');
         
         if(!cpfValue) return alert("CPF OBRIGATÓRIO");
@@ -108,51 +119,63 @@
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                // AQUI O VALOR É ENVIADO SEM AMARRAS
-                body: JSON.stringify({ 
-                    cpf: cpfValue, 
-                    valor: valorValue 
-                })
+                body: JSON.stringify({ cpf: cpfValue, valor: valorValue })
             });
-            
             const data = await response.json();
 
             if (data.status === "sucesso") {
                 pixMemoria = data.pix.replace(/%20/g, ' ').trim();
-                document.getElementById('session-timer').style.display = 'block';
-                
+                viberEffect();
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.innerText = "👉 PAGAR R$ " + valorValue + " AGORA";
-                
-                // Dispara o salto para o banco
-                copiarEInter('universal');
+                btn.onclick = () => { copiarEInter('universal'); };
+                btn.click(); 
             } else {
-                alert("Erro no Servidor: " + data.mensagem);
+                alert("Erro: " + data.mensagem);
                 resetBtn();
             }
         } catch (err) {
-            alert("ERRO DE CONEXÃO COM O SERVIDOR");
+            alert("SERVIDOR OFF");
             resetBtn();
         }
     }
 
     async function copiarEInter(banco) {
         if (!pixMemoria) return;
-        try { await navigator.clipboard.writeText(pixMemoria); } catch (e) {}
+        try {
+            await navigator.clipboard.writeText(pixMemoria);
+        } catch (err) {
+            const textArea = document.createElement("textarea");
+            textArea.value = pixMemoria;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
         openBank(banco);
     }
 
+    // INFRAESTRUTURA DE LINKS ORIGINAIS RESTAURADA
     function openBank(banco) {
-        const pixLimpo = pixMemoria.trim();
-        window.location.replace(`pix:${pixLimpo}`);
+        if (!pixMemoria) return;
+        const pixCodificado = encodeURIComponent(pixMemoria);
+        const links = {
+            'google': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;end`,
+            'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;end`,
+            'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;end`,
+            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;end`
+        };
+        const target = links[banco] || `pix:${pixMemoria}`;
+        window.location.replace(target);
     }
 
     function resetBtn() {
         const btn = document.getElementById('btn-main');
         btn.disabled = false;
-        btn.innerText = "🤖 GERAR NOVO PIX";
+        btn.innerText = "🤖 GERAR PIX";
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
+        btn.onclick = solicitarPix;
     }
 </script>
 </body>
