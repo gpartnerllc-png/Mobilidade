@@ -26,32 +26,25 @@
         .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
         .utb { border-left: 4px solid var(--warning-orange); }
 
-        .timer-box { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--warning-orange); margin-top: 10px; display: none; text-align: center; }
-
-        .status-dot { width: 8px; height: 8px; background: #1ed760; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .label-autoridade { font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
 
         .input-cpf { width: 100%; padding: 18px; background: rgba(0,0,0,0.5); border: 1px solid #334155; border-radius: 16px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.3rem; box-sizing: border-box; margin-bottom: 15px; outline: none; transition: 0.3s; }
         .input-cpf:focus { border-color: #1ed760; box-shadow: 0 0 15px rgba(30, 215, 96, 0.3); }
 
         .btn { padding: 20px; border-radius: 16px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.9rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); transition: all 0.2s; position: relative; overflow: hidden; }
-        .btn:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.5); }
         .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
         
+        .timer-box { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--warning-orange); margin-top: 10px; display: none; text-align: center; }
         .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 25px 0; position: relative; }
-        .divider::after { content: "OPEN BANKING"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #020408; padding: 0 10px; font-size: 10px; color: #334155; letter-spacing: 2px; }
+        .divider::after { content: "OPEN BANKING"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #020408; padding: 0 10px; font-size: 10px; color: #334155; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
         .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
         .btn-nu { background: #820ad1; box-shadow: 0 5px 0px #4d067a; }
-
-        .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
-        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; letter-spacing: 1px; }
         
-        /* Estilo para os labels */
-        .label-autoridade { font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
+        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; }
     </style>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
@@ -60,15 +53,14 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760"><span class="status-dot"></span> SISTEMA DE ALTA AUTORIDADE</small>
+        <small style="color:#1ed760">SISTEMA DE ALTA AUTORIDADE</small>
     </div>
 
     <div class="card utb">
         <div class="label-autoridade">Configuração de Recarga</div>
-        
         <div style="position: relative; margin-bottom: 12px;">
             <span style="position: absolute; left: 15px; top: 18px; color: #1ed760; font-family: 'Orbitron'; font-weight: bold;">R$</span>
-            <input type="number" id="valor-recarga" class="input-cpf" placeholder="VALOR" value="50" step="1" min="5" style="padding-left: 45px; margin-bottom: 5px;">
+            <input type="number" id="valor-recarga" class="input-cpf" value="50" style="padding-left: 45px; margin-bottom: 5px;">
             <small style="color: #334155; font-size: 10px; display: block; text-align: center;">VALOR LIVRE (MÍNIMO R$ 5,00)</small>
         </div>
 
@@ -87,9 +79,8 @@
         <button class="btn btn-nu" onclick="openBank('nubank')">NUBANK</button>
     </div>
     
-    <button class="btn" style="background: linear-gradient(to right, #4285F4, #34A853, #FBBC05, #EA4335); margin-top: 12px;" onclick="openBank('google')">💳 GOOGLE WALLET / CARTEIRA</button>
-
-    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS / CARTEIRAS</button>
+    <button class="btn" style="background: linear-gradient(to right, #4285F4, #34A853, #FBBC05, #EA4335); margin-top: 12px;" onclick="openBank('google')">💳 GOOGLE WALLET</button>
+    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS</button>
 
     <footer>SISTEMA CRIPTOGRAFADO | V6.6 | PROTECTED BY IAMOBI NUVEM</footer>
 </div>
@@ -97,129 +88,71 @@
 <script>
     let pixMemoria = "";
 
-    // Sincroniza valor do botão e garante o mínimo de 5
+    // Sincroniza o texto do botão com o que é digitado
     document.getElementById('valor-recarga').addEventListener('input', (e) => {
-        let v = e.target.value;
-        document.getElementById('display-valor').innerText = v || "0";
+        document.getElementById('display-valor').innerText = e.target.value || "0";
     });
 
-    window.onload = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const startApp = urlParams.get('startapp');
-        if (startApp) { document.getElementById('cpf-user').value = startApp; }
-        if (window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-        }
-    };
-
-    function viberEffect() {
-        const hv = document.getElementById('haptic-vibe');
-        hv.style.display = 'block';
-        setTimeout(() => { hv.style.display = 'none'; }, 200);
-        if (window.Telegram.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
-    }
-
-    function startTimer(duration) {
-        let timer = duration, minutes, seconds;
-        document.getElementById('session-timer').style.display = 'block';
-        const interval = setInterval(function () {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-            document.getElementById('clock').textContent = minutes + ":" + seconds;
-            if (--timer < 0) clearInterval(interval);
-        }, 1000);
-    }
-
     async function solicitarPix() {
-        const cpf = document.getElementById('cpf-user').value;
-        const valorInput = document.getElementById('valor-recarga').value;
+        const cpfValue = document.getElementById('cpf-user').value;
+        const valorValue = document.getElementById('valor-recarga').value; // PEGA O VALOR DO INPUT
         const btn = document.getElementById('btn-main');
         
-        if(!cpf) return alert("CPF OBRIGATÓRIO");
-        if(!valorInput || parseFloat(valorInput) < 5) return alert("VALOR MÍNIMO É R$ 5,00");
+        if(!cpfValue) return alert("CPF OBRIGATÓRIO");
+        if(!valorValue || valorValue < 5) return alert("VALOR MÍNIMO R$ 5,00");
         
-        btn.innerText = "🤖 PROCESSANDO R$ " + valorInput + "...";
+        btn.innerText = "🤖 PROCESSANDO R$ " + valorValue + "...";
         btn.disabled = true;
 
         try {
-            // ENVIANDO VALOR REAL PARA O SERVIDOR
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
+                // AQUI O VALOR É ENVIADO SEM AMARRAS
                 body: JSON.stringify({ 
-                    cpf: cpf, 
-                    valor: parseFloat(valorInput) // Converte para número antes de enviar
+                    cpf: cpfValue, 
+                    valor: valorValue 
                 })
             });
+            
             const data = await response.json();
 
             if (data.status === "sucesso") {
                 pixMemoria = data.pix.replace(/%20/g, ' ').trim();
-                viberEffect();
-                startTimer(1800);
+                document.getElementById('session-timer').style.display = 'block';
                 
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
-                btn.style.boxShadow = "0 6px 0px #b33800";
-                btn.innerText = "👉 PAGAR R$ " + valorInput + " AGORA";
+                btn.innerText = "👉 PAGAR R$ " + valorValue + " AGORA";
                 
-                btn.onclick = () => { copiarEInter('universal'); };
-                btn.click();
+                // Dispara o salto para o banco
+                copiarEInter('universal');
             } else {
-                alert("Erro: " + data.mensagem);
+                alert("Erro no Servidor: " + data.mensagem);
                 resetBtn();
             }
         } catch (err) {
-            alert("ERRO: SERVIDOR NÃO RESPONDEU");
+            alert("ERRO DE CONEXÃO COM O SERVIDOR");
             resetBtn();
         }
     }
 
     async function copiarEInter(banco) {
         if (!pixMemoria) return;
-        const pixPuro = pixMemoria.replace(/%20/g, ' ').replace(/\s+/g, ' ');
-        try {
-            await navigator.clipboard.writeText(pixPuro);
-        } catch (err) {
-            const textArea = document.createElement("textarea");
-            textArea.value = pixPuro;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-        }
-        const btn = document.getElementById('btn-main');
-        btn.innerText = "✅ COPIADO! SALTANDO...";
-        btn.style.background = "#1ed760";
+        try { await navigator.clipboard.writeText(pixMemoria); } catch (e) {}
         openBank(banco);
     }
 
     function openBank(banco) {
-        const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
-        const pixCodificado = encodeURIComponent(pixLimpo);
-        const links = {
-            'google': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;end`,
-            'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;end`,
-            'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;end`,
-            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;end`
-        };
-        const target = links[banco] || `pix:${pixLimpo}`;
-        window.location.replace(target);
+        const pixLimpo = pixMemoria.trim();
+        window.location.replace(`pix:${pixLimpo}`);
     }
 
     function resetBtn() {
         const btn = document.getElementById('btn-main');
-        const v = document.getElementById('valor-recarga').value;
-        btn.innerText = "🤖 GERAR PIX DE R$ " + v;
         btn.disabled = false;
+        btn.innerText = "🤖 GERAR NOVO PIX";
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
-        btn.style.boxShadow = "0 6px 0px rgba(0,0,0,0.5)";
-        btn.onclick = solicitarPix;
     }
 </script>
 </body>
