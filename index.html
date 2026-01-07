@@ -26,7 +26,6 @@
         .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
         .utb { border-left: 4px solid var(--warning-orange); }
 
-        /* ACRESCENTADO: Cronômetro de Autoridade */
         .timer-box { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--warning-orange); margin-top: 10px; display: none; text-align: center; }
 
         .status-dot { width: 8px; height: 8px; background: #1ed760; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite; }
@@ -37,7 +36,6 @@
 
         .btn { padding: 20px; border-radius: 16px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.9rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); transition: all 0.2s; position: relative; overflow: hidden; }
         .btn:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.5); }
-        
         .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
         
         .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 25px 0; position: relative; }
@@ -48,7 +46,6 @@
         .btn-nu { background: #820ad1; box-shadow: 0 5px 0px #4d067a; }
 
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
-
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; letter-spacing: 1px; }
     </style>
 </head>
@@ -90,7 +87,6 @@
         setTimeout(() => { hv.style.display = 'none'; }, 200);
     }
 
-    // ACRESCENTADO: Lógica de Timer Regressivo
     function startTimer(duration) {
         let timer = duration, minutes, seconds;
         document.getElementById('session-timer').style.display = 'block';
@@ -108,7 +104,6 @@
         const cpf = document.getElementById('cpf-user').value;
         const btn = document.getElementById('btn-main');
         if(!cpf) return alert("CPF OBRIGATÓRIO");
-
         btn.innerText = "🤖 PROCESSANDO...";
         btn.disabled = true;
 
@@ -121,9 +116,10 @@
             const data = await response.json();
 
             if (data.status === "sucesso") {
-                pixMemoria = data.pix; 
+                // LIMPEZA IMEDIATA: Remove qualquer resquício de codificação HTML/URL vinda do servidor
+                pixMemoria = data.pix.replace(/%20/g, ' ').trim();
                 viberEffect();
-                startTimer(1800); // 30 minutos
+                startTimer(1800);
                 
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
@@ -141,10 +137,14 @@
     }
 
     function copiarEInter() {
+        // GARANTIA DE LIMPEZA: O segredo para não dar erro no banco
+        const pixPuro = pixMemoria.replace(/%20/g, ' ').replace(/\s+/g, ' ');
+        
         const textArea = document.createElement("textarea");
-        textArea.value = pixMemoria;
+        textArea.value = pixPuro;
         document.body.appendChild(textArea);
         textArea.select();
+        textArea.setSelectionRange(0, 99999); // Suporte para Mobile
         document.execCommand('copy');
         document.body.removeChild(textArea);
         
@@ -153,28 +153,33 @@
         btn.style.background = "#1ed760";
         btn.style.boxShadow = "0 6px 0px #159e46";
         
-        // CORREÇÃO: Usa o protocolo nativo para não piscar no Chrome
         setTimeout(() => openBank('universal'), 600);
     }
 
     function openBank(banco) {
         if (!pixMemoria) return alert("GERA O PIX PRIMEIRO!");
+        
+        // LIMPEZA PARA URL: O banco precisa dos espaços como %20 APENAS na URL, mas nunca na cópia
+        const pixParaUrl = pixMemoria.replace(/\s/g, '%20');
 
         const links = {
             'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
             'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
-            // CORREÇÃO DE AUTORIDADE: Protocolo Nativo pix: em vez de https:
+            // Protocolo Nativo (Não depende de redirecionamento do Chrome)
             'universal': `pix:${pixMemoria}`
         };
 
-        // Fallback para navegadores que bloqueiam protocolos desconhecidos
-        const timer = setTimeout(() => {
-            if (banco === 'universal') {
-                window.location.href = `https://pix.bcb.gov.br/qr/${pixMemoria}`;
-            }
-        }, 500);
-
-        window.location.href = links[banco];
+        // Fallback: Se o pix: não abrir, ele usa a URL oficial do BC tratada
+        if (banco === 'universal') {
+            window.location.href = links['universal'];
+            setTimeout(() => {
+                if (document.hasFocus()) {
+                    window.location.href = `https://pix.bcb.gov.br/qr/${pixParaUrl}`;
+                }
+            }, 800);
+        } else {
+            window.location.href = links[banco];
+        }
     }
 
     function resetBtn() {
