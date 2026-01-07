@@ -174,24 +174,23 @@
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
 
-        // BYPASS GOOGLE PLAY: Usando Esquemas Diretos de Protocolo (Nativo)
+        // DATA SCHEME FINAL (Corrigido via ADB para 2026):
+        // Package Wallet Global: com.google.android.apps.walletnfcrel
         const links = {
-            'inter': `inter://pix?code=${pixCodificado}`,
-            'nubank': `nubank://pix?payload=${pixCodificado}`,
-            'universal': `upi://pay?pa=${pixCodificado}`
+            'inter': `intent://pix#Intent;scheme=inter;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
+            'nubank': `intent://pix#Intent;scheme=nubank;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
+            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;S.browser_fallback_url=pix:${pixLimpo};end`
         };
 
-        // Disparo de Autoridade Máxima: replace() ignora histórico do Chrome e pula Google Play
-        if (links[banco]) {
-            window.location.replace(links[banco]);
-        }
+        // Disparo Direto (Ignora o Chrome via Package Name)
+        window.location.href = links[banco];
 
-        // Se o App não for detectado em 500ms, lança o seletor PIX do Android
+        // Se em 700ms nada acontecer (App não instalado), lança o seletor nativo
         setTimeout(() => {
             if (document.hasFocus()) {
                 window.location.replace(`pix:${pixLimpo}`);
             }
-        }, 500);
+        }, 700);
     }
 
     function resetBtn() {
