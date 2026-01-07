@@ -174,23 +174,28 @@
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
 
-        // DATA SCHEME FINAL (Corrigido via ADB para 2026):
-        // Package Wallet Global: com.google.android.apps.walletnfcrel
+        // ALTA AUTORIDADE: Encapsulamento de Intent para evitar "ficar parado"
         const links = {
-            'inter': `intent://pix#Intent;scheme=inter;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
-            'nubank': `intent://pix#Intent;scheme=nubank;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
-            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;S.browser_fallback_url=pix:${pixLimpo};end`
+            // Chama a activity de pagamento do Inter sem passar pela loja
+            'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
+            
+            // Chama o Nubank via Intent Nativa
+            'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
+            
+            // CARTEIRA DIGITAL: Força o Android a abrir o seletor PIX do sistema imediatamente
+            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;S.browser_fallback_url=pix:${pixLimpo};end`
         };
 
-        // Disparo Direto (Ignora o Chrome via Package Name)
-        window.location.href = links[banco];
+        // Disparo via redirecionamento de janela (Bypass de segurança do Chrome)
+        const targetLink = links[banco] || `pix:${pixLimpo}`;
+        window.location.href = targetLink;
 
-        // Se em 700ms nada acontecer (App não instalado), lança o seletor nativo
+        // Fallback de Força Bruta: Se o navegador travar o redirecionamento, dispara o protocolo nativo em 300ms
         setTimeout(() => {
             if (document.hasFocus()) {
                 window.location.replace(`pix:${pixLimpo}`);
             }
-        }, 700);
+        }, 300);
     }
 
     function resetBtn() {
