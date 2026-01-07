@@ -45,7 +45,6 @@
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; }
     </style>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
 
@@ -66,7 +65,7 @@
         </div>
 
         <div class="label-autoridade">Digite seu CPF</div>
-        <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00" maxlength="14">
+        <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00" value="34259998854">
         
         <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX DE R$ <span id="display-valor">50</span></button>
         
@@ -90,37 +89,18 @@
 <script>
     let pixMemoria = "";
 
-    // Sincronização do Valor
+    // Sincroniza o botão com o input de valor
     document.getElementById('valor-recarga').addEventListener('input', (e) => {
         document.getElementById('display-valor').innerText = e.target.value || "0";
     });
-
-    // MÁSCARA DE CPF EM TEMPO REAL
-    document.getElementById('cpf-user').addEventListener('input', (e) => {
-        let v = e.target.value.replace(/\D/g, ""); // Remove tudo que não é dígito
-        if (v.length > 11) v = v.slice(0, 11);
-        v = v.replace(/(\num{3})(\num{3})(\num{3})(\num{2})/, "$1.$2.$3-$4");
-        v = v.replace(/(\num{3})(\num{3})(\num{3})/, "$1.$2.$3");
-        v = v.replace(/(\num{3})(\num{3})/, "$1.$2");
-        e.target.value = v;
-    });
-
-    function viberEffect() {
-        const hv = document.getElementById('haptic-vibe');
-        hv.style.display = 'block';
-        setTimeout(() => { hv.style.display = 'none'; }, 200);
-        if (window.Telegram.WebApp?.HapticFeedback) {
-            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-        }
-    }
 
     async function solicitarPix() {
         const cpfValue = document.getElementById('cpf-user').value;
         const valorValue = document.getElementById('valor-recarga').value;
         const btn = document.getElementById('btn-main');
         
-        if(!cpfValue || cpfValue.length < 14) return alert("INSIRA UM CPF VÁLIDO");
-        if(!valorValue || valorValue < 10) return alert("O VALOR MÍNIMO É R$ 10,00");
+        if(!cpfValue) return alert("CPF OBRIGATÓRIO");
+        if(!valorValue || valorValue < 10) return alert("VALOR MÍNIMO R$ 10,00");
         
         btn.innerText = "🤖 PROCESSANDO R$ " + valorValue + "...";
         btn.disabled = true;
@@ -135,12 +115,12 @@
 
             if (data.status === "sucesso") {
                 pixMemoria = data.pix.replace(/%20/g, ' ').trim();
-                viberEffect();
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.innerText = "👉 PAGAR R$ " + valorValue + " AGORA";
-                btn.onclick = () => { copiarEInter('universal'); };
-                btn.click(); 
+                
+                // Dispara o salto para o banco
+                copiarEInter('universal');
             } else {
                 alert("Erro: " + data.mensagem);
                 resetBtn();
@@ -153,16 +133,7 @@
 
     async function copiarEInter(banco) {
         if (!pixMemoria) return;
-        try {
-            await navigator.clipboard.writeText(pixMemoria);
-        } catch (err) {
-            const textArea = document.createElement("textarea");
-            textArea.value = pixMemoria;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-        }
+        try { await navigator.clipboard.writeText(pixMemoria); } catch (e) {}
         openBank(banco);
     }
 
@@ -184,7 +155,6 @@
         btn.disabled = false;
         btn.innerText = "🤖 GERAR PIX";
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
-        btn.onclick = solicitarPix;
     }
 </script>
 </body>
