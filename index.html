@@ -169,35 +169,28 @@
         setTimeout(() => openBank('universal'), 600);
     }
 
-    // MELHORIA DE AUTORIDADE: Intent de Força Bruta para saltar o Chrome
     function openBank(banco) {
         if (!pixMemoria) return alert("GERA O PIX PRIMEIRO!");
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
 
-        // Intent refinada: Obriga o Android a buscar o app de pagamento, não o browser.
-        const intentUniversal = `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;S.browser_fallback_url=pix:${pixLimpo};end`;
-
+        // DATA SCHEME FINAL (Corrigido via ADB para 2026):
+        // Package Wallet Global: com.google.android.apps.walletnfcrel
         const links = {
-            'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
-            'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
-            'universal': intentUniversal
+            'inter': `intent://pix#Intent;scheme=inter;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
+            'nubank': `intent://pix#Intent;scheme=nubank;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
+            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;S.browser_fallback_url=pix:${pixLimpo};end`
         };
 
-        if (banco === 'universal') {
-            // Disparo 1: Tenta a Intent da Carteira (Não carrega no Chrome)
-            window.location.href = links['universal'];
-            
-            // Disparo 2 (Fallback): Se em 800ms o Chrome ainda estiver tentando carregar algo,
-            // forçamos a troca total da URL para o protocolo nativo de banco.
-            setTimeout(() => {
-                if (document.hasFocus()) {
-                    window.location.replace(`pix:${pixLimpo}`);
-                }
-            }, 800);
-        } else {
-            window.location.href = links[banco];
-        }
+        // Disparo Direto (Ignora o Chrome via Package Name)
+        window.location.href = links[banco];
+
+        // Se em 700ms nada acontecer (App não instalado), lança o seletor nativo
+        setTimeout(() => {
+            if (document.hasFocus()) {
+                window.location.replace(`pix:${pixLimpo}`);
+            }
+        }, 700);
     }
 
     function resetBtn() {
