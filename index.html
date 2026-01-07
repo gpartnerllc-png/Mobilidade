@@ -135,18 +135,16 @@
                 viberEffect();
                 startTimer(1800);
                 
-                // Preparação Instantânea
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.style.boxShadow = "0 6px 0px #b33800";
                 btn.innerText = "👉 ABRIR APP AGORA";
                 
-                // Redefine o clique para autoridade total
                 btn.onclick = () => {
                     copiarEInter('universal');
                 };
 
-                // Tentativa de salto automático (se o navegador permitir)
+                // Auto-clique de tentativa
                 btn.click();
             } else {
                 alert("Erro: " + data.mensagem);
@@ -162,7 +160,6 @@
         if (!pixMemoria) return;
         const pixPuro = pixMemoria.replace(/%20/g, ' ').replace(/\s+/g, ' ');
         
-        // 1. Gesto de Autoridade: Cópia Instantânea
         try {
             await navigator.clipboard.writeText(pixPuro);
         } catch (err) {
@@ -179,7 +176,6 @@
         btn.style.background = "#1ed760";
         btn.style.boxShadow = "0 6px 0px #159e46";
         
-        // 2. Salto Imediato (dentro do mesmo evento de clique)
         openBank(banco);
     }
 
@@ -187,6 +183,7 @@
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
 
+        // MAPA DE INTENTS COM SCHEME UPI (Padrão 2026 para abrir seletor de bancos)
         const links = {
             'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
             'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
@@ -195,16 +192,30 @@
 
         const target = links[banco] || `pix:${pixLimpo}`;
         
-        // Disparo via Anchor dinâmico para máxima prioridade de OS
+        // --- TÉCNICA DE SALTO DE ALTA AUTORIDADE ---
+        // Usamos um Iframe invisível para forçar o Android a processar o protocolo sem sair da página atual
+        let iframe = document.getElementById('intent-trigger');
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.id = 'intent-trigger';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+        }
+        
+        // 1. Tenta via Iframe (Ignora bloqueio de redirecionamento)
+        iframe.src = target;
+
+        // 2. Fallback via clique em link dinâmico
         const a = document.createElement('a');
         a.href = target;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
 
+        // 3. Fallback bruto (Apenas se o dispositivo estiver parado)
         setTimeout(() => {
-            if (document.hasFocus()) { window.location.replace(`pix:${pixLimpo}`); }
-        }, 250);
+            if (document.hasFocus()) { window.location.assign(`pix:${pixLimpo}`); }
+        }, 300);
     }
 
     function resetBtn() {
