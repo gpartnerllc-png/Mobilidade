@@ -7,16 +7,15 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap');
         
-        /* ACRESCENTADO: Variáveis de Cor e Animação de Pulsação */
         :root {
             --glow-color: #1ed760;
             --cyber-blue: #00f2ff;
+            --warning-orange: #f97316;
         }
 
         body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         .container { width: 100%; max-width: 420px; }
         
-        /* ACRESCENTADO: Efeito Glossy e Glow Dinâmico */
         .header { 
             text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; 
             background: rgba(30, 215, 96, 0.05); box-shadow: 0 0 30px rgba(30, 215, 96, 0.2);
@@ -25,9 +24,11 @@
         .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; letter-spacing: 2px; }
         
         .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .utb { border-left: 4px solid #f97316; }
+        .utb { border-left: 4px solid var(--warning-orange); }
 
-        /* ACRESCENTADO: Indicador de Operação Ativa */
+        /* ACRESCENTADO: Cronômetro de Autoridade */
+        .timer-box { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--warning-orange); margin-top: 10px; display: none; text-align: center; }
+
         .status-dot { width: 8px; height: 8px; background: #1ed760; border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
@@ -39,7 +40,6 @@
         
         .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
         
-        /* ACRESCENTADO: Divisor Visual Super App */
         .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 25px 0; position: relative; }
         .divider::after { content: "OPEN BANKING"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #020408; padding: 0 10px; font-size: 10px; color: #334155; letter-spacing: 2px; }
 
@@ -47,7 +47,6 @@
         .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
         .btn-nu { background: #820ad1; box-shadow: 0 5px 0px #4d067a; }
 
-        /* ACRESCENTADO: Toque de Alta Autoridade (Haptic View) */
         .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
 
         footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; letter-spacing: 1px; }
@@ -64,9 +63,10 @@
     </div>
 
     <div class="card utb">
-        <div style="font-size: 11px; color: #f97316; margin-bottom: 8px; font-weight: bold;">CANAL DE RECARGA UTB</div>
+        <div style="font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold;">CANAL DE RECARGA UTB</div>
         <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00" value="34259998854">
         <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX AUTOMÁTICO</button>
+        <div id="session-timer" class="timer-box">EXPIRA EM: <span id="clock">30:00</span></div>
     </div>
 
     <div class="divider"></div>
@@ -76,7 +76,7 @@
         <button class="btn btn-nu" onclick="openBank('nubank')">NUBANK</button>
     </div>
     
-    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS (PIX LINK)</button>
+    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS (SISTEMA)</button>
 
     <footer>SISTEMA CRIPTOGRAFADO | V6.6 | PROTECTED BY IAMOBI NUVEM</footer>
 </div>
@@ -84,11 +84,24 @@
 <script>
     let pixMemoria = "";
 
-    // ACRESCENTADO: Vibração Visual de Sucesso
     function viberEffect() {
         const hv = document.getElementById('haptic-vibe');
         hv.style.display = 'block';
         setTimeout(() => { hv.style.display = 'none'; }, 200);
+    }
+
+    // ACRESCENTADO: Lógica de Timer Regressivo
+    function startTimer(duration) {
+        let timer = duration, minutes, seconds;
+        document.getElementById('session-timer').style.display = 'block';
+        const interval = setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            document.getElementById('clock').textContent = minutes + ":" + seconds;
+            if (--timer < 0) clearInterval(interval);
+        }, 1000);
     }
 
     async function solicitarPix() {
@@ -100,7 +113,6 @@
         btn.disabled = true;
 
         try {
-            // Infraestrutura original preservada
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -110,14 +122,14 @@
 
             if (data.status === "sucesso") {
                 pixMemoria = data.pix; 
-                viberEffect(); // Efeito de autoridade ao receber o dado
+                viberEffect();
+                startTimer(1800); // 30 minutos
                 
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.style.boxShadow = "0 6px 0px #b33800";
                 btn.innerText = "👉 COPIAR PIX FIEL";
                 btn.onclick = () => copiarEInter();
-                console.log("✅ PIX CAPTURADO INTEGRALMENTE!");
             } else {
                 alert("Erro: " + data.mensagem);
                 resetBtn();
@@ -141,23 +153,26 @@
         btn.style.background = "#1ed760";
         btn.style.boxShadow = "0 6px 0px #159e46";
         
-        // ACRESCENTADO: Abre o banco automaticamente após 600ms para fluidez total
+        // CORREÇÃO: Usa o protocolo nativo para não piscar no Chrome
         setTimeout(() => openBank('universal'), 600);
     }
 
     function openBank(banco) {
-        const pix = pixMemoria;
+        if (!pixMemoria) return alert("GERA O PIX PRIMEIRO!");
+
         const links = {
             'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
             'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
-            // ACRESCENTADO: Universal Deep Link (Abre o app de banco padrão do Android/iOS)
-            'universal': `https://pix.bcb.gov.br/qr/${pix}`
+            // CORREÇÃO DE AUTORIDADE: Protocolo Nativo pix: em vez de https:
+            'universal': `pix:${pixMemoria}`
         };
-        
-        if (banco === 'universal' && !pix) {
-            alert("GERA O PIX PRIMEIRO, COMANDANTE.");
-            return;
-        }
+
+        // Fallback para navegadores que bloqueiam protocolos desconhecidos
+        const timer = setTimeout(() => {
+            if (banco === 'universal') {
+                window.location.href = `https://pix.bcb.gov.br/qr/${pixMemoria}`;
+            }
+        }, 500);
 
         window.location.href = links[banco];
     }
@@ -167,7 +182,6 @@
         btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
         btn.disabled = false;
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
-        btn.style.boxShadow = "0 6px 0px rgba(0,0,0,0.5)";
         btn.onclick = solicitarPix;
     }
 </script>
