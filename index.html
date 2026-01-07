@@ -66,7 +66,7 @@
         <div style="position: relative; margin-bottom: 12px;">
             <span style="position: absolute; left: 15px; top: 18px; color: #1ed760; font-family: 'Orbitron'; font-weight: bold;">R$</span>
             <input type="number" id="valor-recarga" class="input-cpf" placeholder="VALOR" value="50" style="padding-left: 45px; margin-bottom: 5px;">
-            <small style="color: #334155; font-size: 10px; display: block; text-align: center;">VALOR DA RECARGA</small>
+            <small style="color: #334155; font-size: 10px; display: block; text-align: center;">DIGITE O VALOR QUE DESEJA COLOCAR</small>
         </div>
 
         <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00" value="34259998854">
@@ -93,9 +93,10 @@
 <script>
     let pixMemoria = "";
 
-    // Sincroniza valor do botão em tempo real
+    // ATUALIZAÇÃO EM TEMPO REAL DO VALOR NO BOTÃO
     document.getElementById('valor-recarga').addEventListener('input', (e) => {
-        document.getElementById('display-valor').innerText = e.target.value || "0";
+        const val = e.target.value || "0";
+        document.getElementById('display-valor').innerText = val;
     });
 
     window.onload = () => {
@@ -132,20 +133,23 @@
 
     async function solicitarPix() {
         const cpf = document.getElementById('cpf-user').value;
-        const valor = document.getElementById('valor-recarga').value;
+        const valorLivre = document.getElementById('valor-recarga').value;
         const btn = document.getElementById('btn-main');
         
         if(!cpf) return alert("CPF OBRIGATÓRIO");
-        if(!valor || valor <= 0) return alert("VALOR INVÁLIDO");
+        if(!valorLivre || valorLivre <= 0) return alert("INSIRA UM VALOR VÁLIDO");
         
-        btn.innerText = "🤖 PROCESSANDO R$ " + valor + "...";
+        btn.innerText = "🤖 PROCESSANDO R$ " + valorLivre + "...";
         btn.disabled = true;
 
         try {
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ cpf: cpf, valor: valor })
+                body: JSON.stringify({ 
+                    cpf: cpf, 
+                    valor: valorLivre  // ENVIANDO O VALOR DIGITADO
+                })
             });
             const data = await response.json();
 
@@ -157,7 +161,7 @@
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.style.boxShadow = "0 6px 0px #b33800";
-                btn.innerText = "👉 PAGAR R$ " + valor + " AGORA";
+                btn.innerText = "👉 PAGAR R$ " + valorLivre + " AGORA";
                 
                 btn.onclick = () => { copiarEInter('universal'); };
                 btn.click();
@@ -213,27 +217,17 @@
         document.body.appendChild(trigger);
         trigger.click();
 
-        let frame = document.getElementById('iamobi-jump');
-        if (!frame) {
-            frame = document.createElement('iframe');
-            frame.id = 'iamobi-jump';
-            frame.style.display = 'none';
-            document.body.appendChild(frame);
-        }
-        frame.src = target;
-
         setTimeout(() => {
             if (document.hasFocus()) {
                 window.location.replace(target);
             }
-            if(trigger.parentNode) document.body.removeChild(trigger);
         }, 350);
     }
 
     function resetBtn() {
         const btn = document.getElementById('btn-main');
-        const valor = document.getElementById('valor-recarga').value;
-        btn.innerText = "🤖 GERAR PIX DE R$ " + valor;
+        const v = document.getElementById('valor-recarga').value;
+        btn.innerText = "🤖 GERAR PIX DE R$ " + v;
         btn.disabled = false;
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
         btn.style.boxShadow = "0 6px 0px rgba(0,0,0,0.5)";
