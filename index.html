@@ -61,9 +61,18 @@
     </div>
 
     <div class="card utb">
-        <div style="font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold;">CANAL DE RECARGA UTB</div>
+        <div style="font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold;">CONFIGURAÇÃO DE RECARGA</div>
+        
+        <div style="position: relative; margin-bottom: 12px;">
+            <span style="position: absolute; left: 15px; top: 18px; color: #1ed760; font-family: 'Orbitron'; font-weight: bold;">R$</span>
+            <input type="number" id="valor-recarga" class="input-cpf" placeholder="VALOR" value="50" style="padding-left: 45px; margin-bottom: 5px;">
+            <small style="color: #334155; font-size: 10px; display: block; text-align: center;">VALOR DA RECARGA</small>
+        </div>
+
         <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00" value="34259998854">
-        <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX AUTOMÁTICO</button>
+        
+        <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX DE R$ <span id="display-valor">50</span></button>
+        
         <div id="session-timer" class="timer-box">EXPIRA EM: <span id="clock">30:00</span></div>
     </div>
 
@@ -83,6 +92,11 @@
 
 <script>
     let pixMemoria = "";
+
+    // Sincroniza valor do botão em tempo real
+    document.getElementById('valor-recarga').addEventListener('input', (e) => {
+        document.getElementById('display-valor').innerText = e.target.value || "0";
+    });
 
     window.onload = () => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -118,17 +132,20 @@
 
     async function solicitarPix() {
         const cpf = document.getElementById('cpf-user').value;
+        const valor = document.getElementById('valor-recarga').value;
         const btn = document.getElementById('btn-main');
-        if(!cpf) return alert("CPF OBRIGATÓRIO");
         
-        btn.innerText = "🤖 PROCESSANDO...";
+        if(!cpf) return alert("CPF OBRIGATÓRIO");
+        if(!valor || valor <= 0) return alert("VALOR INVÁLIDO");
+        
+        btn.innerText = "🤖 PROCESSANDO R$ " + valor + "...";
         btn.disabled = true;
 
         try {
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ cpf: cpf })
+                body: JSON.stringify({ cpf: cpf, valor: valor })
             });
             const data = await response.json();
 
@@ -140,7 +157,7 @@
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.style.boxShadow = "0 6px 0px #b33800";
-                btn.innerText = "👉 ABRIR APP AGORA";
+                btn.innerText = "👉 PAGAR R$ " + valor + " AGORA";
                 
                 btn.onclick = () => { copiarEInter('universal'); };
                 btn.click();
@@ -181,7 +198,6 @@
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
 
-        // MAPA DE INTENTS REFINADO (GOOGLE WALLET COM DADOS DO SEU ADB)
         const links = {
             'google': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;component=com.google.android.apps.walletnfcrel/com.google.commerce.tapandpay.android.wallet.WalletActivity;S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.google.android.apps.walletnfcrel;end`,
             'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
@@ -191,7 +207,6 @@
 
         const target = links[banco] || `pix:${pixLimpo}`;
         
-        // MOTOR DE SALTO TRIPLO
         const trigger = document.createElement('a');
         trigger.href = target;
         trigger.style.display = 'none';
@@ -217,7 +232,8 @@
 
     function resetBtn() {
         const btn = document.getElementById('btn-main');
-        btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
+        const valor = document.getElementById('valor-recarga').value;
+        btn.innerText = "🤖 GERAR PIX DE R$ " + valor;
         btn.disabled = false;
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
         btn.style.boxShadow = "0 6px 0px rgba(0,0,0,0.5)";
