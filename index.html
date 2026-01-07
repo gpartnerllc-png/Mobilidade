@@ -82,14 +82,12 @@
 <script>
     let pixMemoria = "";
 
-    // MELHORIA: Captura de CPF via Deep Link do Telegram ao carregar
     window.onload = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const startApp = urlParams.get('startapp');
         if (startApp) {
             document.getElementById('cpf-user').value = startApp;
         }
-        // Inicializa Mini App
         if (window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
@@ -100,7 +98,6 @@
         const hv = document.getElementById('haptic-vibe');
         hv.style.display = 'block';
         setTimeout(() => { hv.style.display = 'none'; }, 200);
-        // Vibração real no Telegram
         if (window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
             window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
         }
@@ -172,29 +169,32 @@
         setTimeout(() => openBank('universal'), 600);
     }
 
-    // MELHORIA: Protocolo de Força Bruta para evitar o loop do Chrome
+    // MELHORIA DE AUTORIDADE: Intent de Força Bruta para saltar o Chrome
     function openBank(banco) {
         if (!pixMemoria) return alert("GERA O PIX PRIMEIRO!");
-        const pixPuro = pixMemoria.replace(/%20/g, ' ').trim();
-        const pixParaUrl = encodeURIComponent(pixPuro);
+        const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
+        const pixCodificado = encodeURIComponent(pixLimpo);
+
+        // Intent refinada: Obriga o Android a buscar o app de pagamento, não o browser.
+        const intentUniversal = `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;S.browser_fallback_url=pix:${pixLimpo};end`;
 
         const links = {
             'inter': 'intent://#Intent;scheme=inter;package=br.com.intermedium;end',
             'nubank': 'intent://#Intent;scheme=nubank;package=com.nu.production;end',
-            // INTENT DA CARTEIRA GOOGLE (Força a abertura do seletor nativo do Android)
-            'universal': `intent://pay?pa=${pixParaUrl}#Intent;scheme=upi;end`
+            'universal': intentUniversal
         };
 
         if (banco === 'universal') {
-            // Tenta a Carteira primeiro
+            // Disparo 1: Tenta a Intent da Carteira (Não carrega no Chrome)
             window.location.href = links['universal'];
             
-            // Fallback imediato para o protocolo 'pix:' se a carteira não responder
+            // Disparo 2 (Fallback): Se em 800ms o Chrome ainda estiver tentando carregar algo,
+            // forçamos a troca total da URL para o protocolo nativo de banco.
             setTimeout(() => {
                 if (document.hasFocus()) {
-                    window.location.href = `pix:${pixPuro}`;
+                    window.location.replace(`pix:${pixLimpo}`);
                 }
-            }, 500);
+            }, 800);
         } else {
             window.location.href = links[banco];
         }
