@@ -85,9 +85,7 @@
     window.onload = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const startApp = urlParams.get('startapp');
-        if (startApp) {
-            document.getElementById('cpf-user').value = startApp;
-        }
+        if (startApp) { document.getElementById('cpf-user').value = startApp; }
         if (window.Telegram.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
@@ -98,7 +96,7 @@
         const hv = document.getElementById('haptic-vibe');
         hv.style.display = 'block';
         setTimeout(() => { hv.style.display = 'none'; }, 200);
-        if (window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+        if (window.Telegram.WebApp?.HapticFeedback) {
             window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
         }
     }
@@ -120,6 +118,7 @@
         const cpf = document.getElementById('cpf-user').value;
         const btn = document.getElementById('btn-main');
         if(!cpf) return alert("CPF OBRIGATÓRIO");
+        
         btn.innerText = "🤖 PROCESSANDO...";
         btn.disabled = true;
 
@@ -136,11 +135,19 @@
                 viberEffect();
                 startTimer(1800);
                 
+                // Preparação Instantânea
                 btn.disabled = false;
                 btn.style.background = "#ff5000";
                 btn.style.boxShadow = "0 6px 0px #b33800";
-                btn.innerText = "👉 COPIAR PIX FIEL";
-                btn.onclick = () => copiarEInter();
+                btn.innerText = "👉 ABRIR APP AGORA";
+                
+                // Redefine o clique para autoridade total
+                btn.onclick = () => {
+                    copiarEInter('universal');
+                };
+
+                // Tentativa de salto automático (se o navegador permitir)
+                btn.click();
             } else {
                 alert("Erro: " + data.mensagem);
                 resetBtn();
@@ -151,51 +158,53 @@
         }
     }
 
-    function copiarEInter() {
+    async function copiarEInter(banco) {
+        if (!pixMemoria) return;
         const pixPuro = pixMemoria.replace(/%20/g, ' ').replace(/\s+/g, ' ');
-        const textArea = document.createElement("textarea");
-        textArea.value = pixPuro;
-        document.body.appendChild(textArea);
-        textArea.select();
-        textArea.setSelectionRange(0, 99999);
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
+        
+        // 1. Gesto de Autoridade: Cópia Instantânea
+        try {
+            await navigator.clipboard.writeText(pixPuro);
+        } catch (err) {
+            const textArea = document.createElement("textarea");
+            textArea.value = pixPuro;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
         
         const btn = document.getElementById('btn-main');
-        btn.innerText = "✅ COPIADO! ABRINDO...";
+        btn.innerText = "✅ COPIADO! SALTANDO...";
         btn.style.background = "#1ed760";
         btn.style.boxShadow = "0 6px 0px #159e46";
         
-        setTimeout(() => openBank('universal'), 600);
+        // 2. Salto Imediato (dentro do mesmo evento de clique)
+        openBank(banco);
     }
 
     function openBank(banco) {
-        if (!pixMemoria) return alert("GERA O PIX PRIMEIRO!");
         const pixLimpo = pixMemoria.replace(/%20/g, ' ').trim();
         const pixCodificado = encodeURIComponent(pixLimpo);
 
-        // ALTA AUTORIDADE: Encapsulamento de Intent para evitar "ficar parado"
         const links = {
-            // Chama a activity de pagamento do Inter sem passar pela loja
             'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;S.browser_fallback_url=pix:${pixLimpo};end`,
-            
-            // Chama o Nubank via Intent Nativa
             'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;S.browser_fallback_url=pix:${pixLimpo};end`,
-            
-            // CARTEIRA DIGITAL: Força o Android a abrir o seletor PIX do sistema imediatamente
             'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;S.browser_fallback_url=pix:${pixLimpo};end`
         };
 
-        // Disparo via redirecionamento de janela (Bypass de segurança do Chrome)
-        const targetLink = links[banco] || `pix:${pixLimpo}`;
-        window.location.href = targetLink;
+        const target = links[banco] || `pix:${pixLimpo}`;
+        
+        // Disparo via Anchor dinâmico para máxima prioridade de OS
+        const a = document.createElement('a');
+        a.href = target;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
-        // Fallback de Força Bruta: Se o navegador travar o redirecionamento, dispara o protocolo nativo em 300ms
         setTimeout(() => {
-            if (document.hasFocus()) {
-                window.location.replace(`pix:${pixLimpo}`);
-            }
-        }, 300);
+            if (document.hasFocus()) { window.location.replace(`pix:${pixLimpo}`); }
+        }, 250);
     }
 
     function resetBtn() {
@@ -203,6 +212,7 @@
         btn.innerText = "🤖 GERAR PIX AUTOMÁTICO";
         btn.disabled = false;
         btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
+        btn.style.boxShadow = "0 6px 0px rgba(0,0,0,0.5)";
         btn.onclick = solicitarPix;
     }
 </script>
