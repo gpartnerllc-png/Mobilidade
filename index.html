@@ -11,39 +11,113 @@
             --glow-color: #1ed760;
             --cyber-blue: #00f2ff;
             --warning-orange: #f97316;
+            --glass-bg: rgba(15, 23, 42, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        body { background: #020408; color: #f8fafc; font-family: 'Rajdhani', sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        body { 
+            background: radial-gradient(circle at top, #111827 0%, #020408 100%); 
+            color: #f8fafc; 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
         .container { width: 100%; max-width: 420px; }
         
+        /* Header com Vidro e Brilho */
         .header { 
-            text-align: center; padding: 20px; border: 1px solid #1ed760; border-radius: 15px; margin-bottom: 25px; 
-            background: rgba(30, 215, 96, 0.05); box-shadow: 0 0 30px rgba(30, 215, 96, 0.2);
-            backdrop-filter: blur(5px);
+            text-align: center; 
+            padding: 25px; 
+            border: 1px solid var(--glass-border); 
+            border-radius: 20px; 
+            margin-bottom: 25px; 
+            background: var(--glass-bg); 
+            box-shadow: 0 0 30px rgba(30, 215, 96, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
-        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #1ed760; margin: 0; letter-spacing: 2px; }
+        .header h1 { font-family: 'Orbitron', sans-serif; font-size: 2.1rem; color: #1ed760; margin: 0; letter-spacing: 3px; text-shadow: 0 0 15px rgba(30, 215, 96, 0.4); }
         
-        .card { background: linear-gradient(145deg, #0f172a 0%, #020617 100%); border-radius: 24px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .utb { border-left: 4px solid var(--warning-orange); }
+        /* Card UTB Modernizado */
+        .card { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px; 
+            padding: 25px; 
+            margin-bottom: 15px; 
+            border: 1px solid var(--glass-border);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        .utb { border-left: 5px solid var(--warning-orange); }
 
-        .label-autoridade { font-size: 11px; color: var(--warning-orange); margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .label-autoridade { font-size: 11px; color: #94a3b8; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
 
-        .input-cpf { width: 100%; padding: 18px; background: rgba(0,0,0,0.5); border: 1px solid #334155; border-radius: 16px; color: #1ed760; font-family: 'Orbitron', sans-serif; text-align: center; font-size: 1.3rem; box-sizing: border-box; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .input-cpf:focus { border-color: #1ed760; box-shadow: 0 0 15px rgba(30, 215, 96, 0.3); }
+        /* Inputs com Foco em Neon */
+        .input-cpf { 
+            width: 100%; 
+            padding: 20px; 
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid #1e293b; 
+            border-radius: 18px; 
+            color: #1ed760; 
+            font-family: 'Orbitron', sans-serif; 
+            text-align: center; 
+            font-size: 1.4rem; 
+            box-sizing: border-box; 
+            margin-bottom: 15px; 
+            outline: none; 
+            transition: all 0.3s; 
+        }
+        .input-cpf:focus { border-color: var(--cyber-blue); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); background: rgba(0,0,0,0.6); }
 
-        .btn { padding: 20px; border-radius: 16px; border: none; font-weight: bold; cursor: pointer; color: #fff; font-size: 0.9rem; text-transform: uppercase; width: 100%; font-family: 'Orbitron', sans-serif; margin-top: 10px; box-shadow: 0 6px 0px rgba(0,0,0,0.5); transition: all 0.2s; position: relative; overflow: hidden; }
-        .btn-robot { background: linear-gradient(to bottom, #00f2ff, #0066ff); }
+        /* Botão de Alta Performance */
+        .btn { 
+            padding: 22px; 
+            border-radius: 18px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            color: #fff; 
+            font-size: 0.95rem; 
+            text-transform: uppercase; 
+            width: 100%; 
+            font-family: 'Orbitron', sans-serif; 
+            margin-top: 10px; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+        .btn-robot { 
+            background: linear-gradient(135deg, #00f2ff, #0066ff); 
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+        }
+        .btn-robot:active { transform: scale(0.98); }
+        .btn-robot:disabled { opacity: 0.6; filter: grayscale(0.5); cursor: wait; }
+
+        .timer-box { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--warning-orange); margin-top: 15px; text-align: center; font-weight: bold; }
         
-        .timer-box { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--warning-orange); margin-top: 10px; display: none; text-align: center; }
-        .divider { height: 1px; background: rgba(255,255,255,0.1); margin: 25px 0; position: relative; }
-        .divider::after { content: "OPEN BANKING"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #020408; padding: 0 10px; font-size: 10px; color: #334155; letter-spacing: 2px; }
+        .divider { height: 1px; background: rgba(255,255,255,0.08); margin: 30px 0; position: relative; }
+        .divider::after { content: "PROTOCOLO OPEN BANKING"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #020408; padding: 0 15px; font-size: 10px; color: #475569; letter-spacing: 3px; }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-        .btn-inter { background: #ff7a00; box-shadow: 0 5px 0px #b35600; }
-        .btn-nu { background: #820ad1; box-shadow: 0 5px 0px #4d067a; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .btn-inter { background: #ff7a00; border-bottom: 4px solid #b35600; }
+        .btn-nu { background: #820ad1; border-bottom: 4px solid #4d067a; }
         
-        .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 215, 96, 0.1); display: none; pointer-events: none; z-index: 100; border: 5px solid #1ed760; box-sizing: border-box; }
-        footer { margin-top: 30px; font-size: 0.65rem; color: #334155; font-family: monospace; text-align: center; }
+        /* Efeito de Sucesso Neon */
+        .success-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(30, 215, 96, 0.08); display: none; pointer-events: none; z-index: 100; 
+            border: 10px solid #1ed760; box-sizing: border-box; 
+        }
+
+        footer { margin-top: 40px; font-size: 0.7rem; color: #334155; font-family: monospace; text-align: center; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -53,23 +127,23 @@
 <div class="container">
     <div class="header">
         <h1>IAMOBI</h1>
-        <small style="color:#1ed760">SISTEMA DE ALTA AUTORIDADE</small>
+        <small style="color:#1ed760; letter-spacing: 2px;">SISTEMA DE ALTA AUTORIDADE</small>
     </div>
 
     <div class="card utb">
         <div class="label-autoridade">Configuração de Recarga</div>
-        <div style="position: relative; margin-bottom: 12px;">
-            <span style="position: absolute; left: 15px; top: 18px; color: #1ed760; font-family: 'Orbitron'; font-weight: bold;">R$</span>
-            <input type="number" id="valor-recarga" class="input-cpf" placeholder="0" min="10" style="padding-left: 45px; margin-bottom: 5px;">
-            <small style="color: #334155; font-size: 10px; display: block; text-align: center;">VALOR LIVRE (MÍNIMO R$ 10,00)</small>
+        <div style="position: relative; margin-bottom: 15px;">
+            <span style="position: absolute; left: 15px; top: 20px; color: #1ed760; font-family: 'Orbitron'; font-weight: bold; font-size: 1.2rem;">R$</span>
+            <input type="number" id="valor-recarga" class="input-cpf" placeholder="0" min="10" style="padding-left: 55px; margin-bottom: 5px;">
+            <small style="color: #475569; font-size: 10px; display: block; text-align: center; font-weight: bold;">VALOR MÍNIMO DE OPERAÇÃO: R$ 10,00</small>
         </div>
 
-        <div class="label-autoridade">Digite seu CPF</div>
+        <div class="label-autoridade">Identificação de Destino (CPF)</div>
         <input type="text" id="cpf-user" class="input-cpf" placeholder="000.000.000-00">
         
         <button id="btn-main" class="btn btn-robot" onclick="solicitarPix()">🤖 GERAR PIX DE R$ <span id="display-valor">0</span></button>
         
-        <div id="session-timer" class="timer-box">EXPIRA EM: <span id="clock">30:00</span></div>
+        <div id="session-timer" class="timer-box" style="display:none;">SESSÃO PROTEGIDA | EXPIRA EM: <span id="clock">30:00</span></div>
     </div>
 
     <div class="divider"></div>
@@ -79,17 +153,16 @@
         <button class="btn btn-nu" onclick="openBank('nubank')">NUBANK</button>
     </div>
     
-    <button class="btn" style="background: linear-gradient(to right, #4285F4, #34A853, #FBBC05, #EA4335); margin-top: 12px;" onclick="openBank('google')">💳 GOOGLE WALLET / CARTEIRA</button>
+    <button class="btn" style="background: linear-gradient(90deg, #4285F4, #34A853, #FBBC05, #EA4335); margin-top: 15px;" onclick="openBank('google')">💳 GOOGLE PAY / WALLET</button>
 
-    <button class="btn" style="background: #202124; border: 1px solid #334155; margin-top: 12px;" onclick="openBank('universal')">📱 OUTROS BANCOS / CARTEIRAS</button>
+    <button class="btn" style="background: #1e293b; border: 1px solid var(--glass-border); margin-top: 15px;" onclick="openBank('universal')">📱 OUTROS BANCOS</button>
 
-    <footer>SISTEMA CRIPTOGRAFADO | V6.6 | PROTECTED BY IAMOBI NUVEM</footer>
+    <footer>SISTEMA CRIPTOGRAFADO | V6.6 | PROTECTED BY IAMOBI CLOUD NUVEM</footer>
 </div>
 
 <script>
     let pixMemoria = "";
 
-    // Sincroniza o botão com o input de valor
     document.getElementById('valor-recarga').addEventListener('input', (e) => {
         document.getElementById('display-valor').innerText = e.target.value || "0";
     });
@@ -102,10 +175,11 @@
         if(!cpfValue) return alert("CPF OBRIGATÓRIO");
         if(!valorValue || valorValue < 10) return alert("VALOR MÍNIMO R$ 10,00");
         
-        btn.innerText = "🤖 PROCESSANDO R$ " + valorValue + "...";
+        btn.innerText = "⚡ PROCESSANDO PROTOCOLO...";
         btn.disabled = true;
 
         try {
+            // A INFRAESTRUTURA PERMANECE IGUAL
             const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -115,18 +189,25 @@
 
             if (data.status === "sucesso") {
                 pixMemoria = data.pix.replace(/%20/g, ' ').trim();
-                btn.disabled = false;
-                btn.style.background = "#ff5000";
-                btn.innerText = "👉 PAGAR R$ " + valorValue + " AGORA";
                 
-                // Dispara o salto para o banco
+                // Feedback de Sucesso 2026
+                document.getElementById('haptic-vibe').style.display = 'block';
+                setTimeout(() => { document.getElementById('haptic-vibe').style.display = 'none'; }, 1500);
+
+                btn.disabled = false;
+                btn.style.background = "#1ed760";
+                btn.style.color = "#000";
+                btn.innerText = "✅ PIX COPIADO! PAGAR AGORA";
+                
+                document.getElementById('session-timer').style.display = 'block';
+
                 copiarEInter('universal');
             } else {
                 alert("Erro: " + data.mensagem);
                 resetBtn();
             }
         } catch (err) {
-            alert("SERVIDOR OFF");
+            alert("SERVIDOR IAMOBI OFF - VERIFIQUE A CONEXÃO");
             resetBtn();
         }
     }
@@ -154,7 +235,8 @@
         const btn = document.getElementById('btn-main');
         btn.disabled = false;
         btn.innerText = "🤖 GERAR PIX";
-        btn.style.background = "linear-gradient(to bottom, #00f2ff, #0066ff)";
+        btn.style.background = "linear-gradient(135deg, #00f2ff, #0066ff)";
+        btn.style.color = "#fff";
     }
 </script>
 </body>
