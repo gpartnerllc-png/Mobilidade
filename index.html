@@ -179,8 +179,8 @@
         btn.disabled = true;
 
         try {
-            // A INFRAESTRUTURA PERMANECE IGUAL
-            const response = await fetch('http://192.168.100.2:5000/gerar_por_cpf', {
+            // INFRAESTRUTURA ATUALIZADA: APONTANDO PARA O IP ELÁSTICO AWS
+            const response = await fetch('http://56.126.33.76:5000/gerar_por_cpf', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ cpf: cpfValue, valor: valorValue })
