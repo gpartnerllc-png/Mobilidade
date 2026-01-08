@@ -174,8 +174,8 @@
         btn.disabled = true;
 
         try {
-            // BYPASS DE SEGURANÇA E CACHE
-            const response = await fetch(`http://56.126.33.76:5000/gerar_por_cpf?t=${Date.now()}`, {
+            // CONEXÃO COM DOMÍNIO OFICIAL SSL
+            const response = await fetch(`https://iamobi.droppfy.com/passe`, {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
@@ -209,8 +209,7 @@
             }
         } catch (err) {
             console.error("ERRO DETALHADO:", err);
-            // Mensagem de autoridade para o usuário entender o bloqueio do navegador
-            alert("⚠️ BLOQUEIO DE NAVEGADOR: O sistema detectou que o navegador impediu a conexão insegura (HTTP). \n\nSOLUÇÃO: Se estiver usando HTTPS no site, mude para HTTP ou use uma aba anônima.");
+            alert("⚠️ FALHA DE CONEXÃO: O servidor não respondeu. Certifique-se de que a API está rodando.");
             resetBtn();
         }
     }
@@ -220,7 +219,6 @@
         try { 
             await navigator.clipboard.writeText(pixMemoria); 
         } catch (e) {
-            // Fallback para navegadores que bloqueiam clipboard via script
             const input = document.createElement("input");
             input.value = pixMemoria;
             document.body.appendChild(input);
