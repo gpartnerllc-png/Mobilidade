@@ -30,7 +30,6 @@
 
         .container { width: 100%; max-width: 420px; }
         
-        /* Header com Vidro e Brilho */
         .header { 
             text-align: center; 
             padding: 25px; 
@@ -44,7 +43,6 @@
         }
         .header h1 { font-family: 'Orbitron', sans-serif; font-size: 2.1rem; color: #1ed760; margin: 0; letter-spacing: 3px; text-shadow: 0 0 15px rgba(30, 215, 96, 0.4); }
         
-        /* Card UTB Modernizado */
         .card { 
             background: var(--glass-bg); 
             backdrop-filter: blur(20px);
@@ -60,7 +58,6 @@
 
         .label-autoridade { font-size: 11px; color: #94a3b8; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* Inputs com Foco em Neon */
         .input-cpf { 
             width: 100%; 
             padding: 20px; 
@@ -78,7 +75,6 @@
         }
         .input-cpf:focus { border-color: var(--cyber-blue); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); background: rgba(0,0,0,0.6); }
 
-        /* Botão de Alta Performance */
         .btn { 
             padding: 22px; 
             border-radius: 18px; 
@@ -110,7 +106,6 @@
         .btn-inter { background: #ff7a00; border-bottom: 4px solid #b35600; }
         .btn-nu { background: #820ad1; border-bottom: 4px solid #4d067a; }
         
-        /* Efeito de Sucesso Neon */
         .success-overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(30, 215, 96, 0.08); display: none; pointer-events: none; z-index: 100; 
@@ -175,22 +170,29 @@
         if(!cpfValue) return alert("CPF OBRIGATÓRIO");
         if(!valorValue || valorValue < 10) return alert("VALOR MÍNIMO R$ 10,00");
         
-        btn.innerText = "⚡ PROCESSANDO PROTOCOLO...";
+        btn.innerText = "⚡ CONECTANDO À NUVEM...";
         btn.disabled = true;
 
         try {
-            // INFRAESTRUTURA ATUALIZADA: APONTANDO PARA O IP ELÁSTICO AWS
-            const response = await fetch('http://56.126.33.76:5000/gerar_por_cpf', {
+            // BYPASS DE SEGURANÇA E CACHE
+            const response = await fetch(`http://56.126.33.76:5000/gerar_por_cpf?t=${Date.now()}`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({ cpf: cpfValue, valor: valorValue })
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP Erro: ${response.status}`);
+            }
+
             const data = await response.json();
 
             if (data.status === "sucesso") {
                 pixMemoria = data.pix.replace(/%20/g, ' ').trim();
-                
-                // Feedback de Sucesso 2026
                 document.getElementById('haptic-vibe').style.display = 'block';
                 setTimeout(() => { document.getElementById('haptic-vibe').style.display = 'none'; }, 1500);
 
@@ -198,23 +200,34 @@
                 btn.style.background = "#1ed760";
                 btn.style.color = "#000";
                 btn.innerText = "✅ PIX COPIADO! PAGAR AGORA";
-                
                 document.getElementById('session-timer').style.display = 'block';
 
                 copiarEInter('universal');
             } else {
-                alert("Erro: " + data.mensagem);
+                alert("AVISO DO ROBÔ: " + data.mensagem);
                 resetBtn();
             }
         } catch (err) {
-            alert("SERVIDOR IAMOBI OFF - VERIFIQUE A CONEXÃO");
+            console.error("ERRO DETALHADO:", err);
+            // Mensagem de autoridade para o usuário entender o bloqueio do navegador
+            alert("⚠️ BLOQUEIO DE NAVEGADOR: O sistema detectou que o navegador impediu a conexão insegura (HTTP). \n\nSOLUÇÃO: Se estiver usando HTTPS no site, mude para HTTP ou use uma aba anônima.");
             resetBtn();
         }
     }
 
     async function copiarEInter(banco) {
         if (!pixMemoria) return;
-        try { await navigator.clipboard.writeText(pixMemoria); } catch (e) {}
+        try { 
+            await navigator.clipboard.writeText(pixMemoria); 
+        } catch (e) {
+            // Fallback para navegadores que bloqueiam clipboard via script
+            const input = document.createElement("input");
+            input.value = pixMemoria;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand("copy");
+            document.body.removeChild(input);
+        }
         openBank(banco);
     }
 
