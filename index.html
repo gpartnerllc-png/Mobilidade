@@ -174,72 +174,85 @@
         btn.disabled = true;
 
         try {
-            // CONEXÃO COM DOMÍNIO OFICIAL SSL
-            const response = await fetch(`https://iamobi.droppfy.com/passe`, {
+            // Chamada para a API Blindada HTTPS
+            const response = await fetch('https://iamobi.droppfy.com/passe', {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ cpf: cpfValue, valor: valorValue })
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP Erro: ${response.status}`);
+                throw new Error(`Servidor Offline: ${response.status}`);
             }
 
             const data = await response.json();
 
             if (data.status === "sucesso") {
-                pixMemoria = data.pix.replace(/%20/g, ' ').trim();
+                // Captura o código PIX e limpa espaços
+                pixMemoria = data.pix.trim();
+                
+                // Feedback visual de sucesso
                 document.getElementById('haptic-vibe').style.display = 'block';
                 setTimeout(() => { document.getElementById('haptic-vibe').style.display = 'none'; }, 1500);
 
+                // Atualiza o botão principal
                 btn.disabled = false;
                 btn.style.background = "#1ed760";
                 btn.style.color = "#000";
                 btn.innerText = "✅ PIX COPIADO! PAGAR AGORA";
                 document.getElementById('session-timer').style.display = 'block';
 
-                copiarEInter('universal');
+                // Copia automaticamente para a área de transferência
+                copiarTexto(pixMemoria);
             } else {
-                alert("AVISO DO ROBÔ: " + data.mensagem);
+                alert("ERRO NO SISTEMA: " + data.mensagem);
                 resetBtn();
             }
         } catch (err) {
-            console.error("ERRO DETALHADO:", err);
-            alert("⚠️ FALHA DE CONEXÃO: O servidor não respondeu. Certifique-se de que a API está rodando.");
+            console.error("Erro na requisição:", err);
+            alert("⚠️ FALHA NA REDE: Verifique sua conexão ou se o robô está ativo.");
             resetBtn();
         }
     }
 
-    async function copiarEInter(banco) {
-        if (!pixMemoria) return;
-        try { 
-            await navigator.clipboard.writeText(pixMemoria); 
+    async function copiarTexto(texto) {
+        try {
+            await navigator.clipboard.writeText(texto);
         } catch (e) {
             const input = document.createElement("input");
-            input.value = pixMemoria;
+            input.value = texto;
             document.body.appendChild(input);
             input.select();
             document.execCommand("copy");
             document.body.removeChild(input);
         }
-        openBank(banco);
     }
 
     function openBank(banco) {
-        if (!pixMemoria) return;
-        const pixCodificado = encodeURIComponent(pixMemoria);
+        if (!pixMemoria) {
+            alert("PRIMEIRO GERE O PIX ACIMA");
+            return;
+        }
+        
+        // Copia novamente para garantir antes de abrir o app
+        copiarTexto(pixMemoria);
+
         const links = {
-            'google': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.google.android.apps.walletnfcrel;end`,
-            'inter': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=br.com.intermedium;end`,
-            'nubank': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;package=com.nu.production;end`,
-            'universal': `intent://pay?pa=${pixCodificado}#Intent;scheme=upi;end`
+            'google': "https://pay.google.com/",
+            'inter': "intermedium://",
+            'nubank': "nubank://",
+            'universal': "pix:" // Protocolo universal para abrir apps de banco
         };
-        const target = links[banco] || `pix:${pixMemoria}`;
-        window.location.replace(target);
+
+        const target = links[banco] || "pix:";
+        
+        // Pequeno delay para garantir que a cópia foi feita
+        setTimeout(() => {
+            window.location.href = target;
+        }, 500);
     }
 
     function resetBtn() {
